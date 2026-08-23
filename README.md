@@ -52,7 +52,9 @@ ao usuário — nada é dado como enviado por engano.
 | [`mobile/`](mobile/README.md) | app React Native + Expo (splash e fluxo de auth) |
 | `legacy-static/` | versão HTML/CSS/JS original da landing, como referência |
 
-`mobile/` e `legacy-static/` estão no `.vercelignore` — não entram no deploy da web.
+`legacy-static/` está no `.vercelignore` da raiz — não entra no deploy da landing. `mobile/` **não**
+está mais lá: ele também é publicado na Vercel, como projeto separado (Root Directory `mobile`,
+usando `mobile/vercel.json`) — veja [mobile/README.md](mobile/README.md#eas--build-e-submissão).
 
 ## Estrutura
 
