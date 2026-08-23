@@ -22,6 +22,9 @@ import { colors, radius, space, type } from "@/src/theme/tokens";
  */
 const TAMANHO_CODIGO = 8;
 
+/** Menor tamanho aceito no botão — cobre projetos configurados com 6. */
+const MINIMO_CODIGO = 6;
+
 export default function ConfirmarEmail() {
   const router = useRouter();
   const { email } = useLocalSearchParams<{ email?: string }>();
@@ -37,14 +40,16 @@ export default function ConfirmarEmail() {
   const emailNormalizado = email?.trim().toLowerCase();
 
   async function confirmar(valor: string) {
-    if (!emailNormalizado || valor.length !== TAMANHO_CODIGO) return;
+    // Aceita a partir de MINIMO_CODIGO em vez de exigir o tamanho exato: o
+    // tamanho do OTP é configurável no projeto e já mudou uma vez (6 -> 8).
+    // Travar no número exato transforma uma mudança de config numa tela morta.
+    if (!emailNormalizado || valor.length < MINIMO_CODIGO) return;
     setConfirmando(true);
     setErro(null);
 
-    // "email" é o tipo certo pra verificar o código de 6 dígitos aqui —
-    // "signup" é o tipo usado no OUTRO fluxo (link de confirmação por
-    // token_hash), não no verifyOtp de código. Usar "signup" aqui faz o
-    // Supabase recusar até o código certo com "Token has expired or is invalid".
+    // "email" é o tipo certo pra verificar o código aqui — "signup" é o tipo
+    // do OUTRO fluxo (link de confirmação por token_hash). Usar "signup" aqui
+    // faz o Supabase recusar até o código certo com "Token has expired".
     const { error } = await supabase.auth.verifyOtp({
       email: emailNormalizado,
       token: valor,
@@ -52,7 +57,13 @@ export default function ConfirmarEmail() {
     });
 
     if (error) {
-      setErro("Código incorreto ou expirado. Confira o e-mail ou peça um novo.");
+      // O Supabase devolve a mesma mensagem genérica ("Token has expired or
+      // is invalid") tanto pra código errado quanto pra código de tamanho
+      // errado ou tipo errado. Mostrar o código técnico economiza horas de
+      // depuração quando o problema é config, não digitação.
+      setErro(
+        `Código incorreto ou expirado. Confira o e-mail ou peça um novo. (${error.code ?? error.message})`
+      );
       setCodigo("");
     } else {
       router.replace("/home");
@@ -127,7 +138,7 @@ export default function ConfirmarEmail() {
           label="Confirmar"
           onPress={() => confirmar(codigo)}
           loading={confirmando}
-          disabled={codigo.length !== TAMANHO_CODIGO}
+          disabled={codigo.length < MINIMO_CODIGO}
         />
         <Button label="Reenviar código" variant="ghost" loading={reenviando} onPress={reenviar} />
       </View>
