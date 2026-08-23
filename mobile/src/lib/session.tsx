@@ -35,27 +35,46 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       setProfile(null);
       return;
     }
-    const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+    // Erro aqui não pode passar batido: perfil null faz a Home renderizar a
+    // persona errada (contratante vendo tela de profissional) em vez de
+    // avisar que algo falhou.
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error) {
+      console.warn("[session] falha ao carregar perfil:", error.message);
+      setProfile(null);
+      return;
+    }
     setProfile(data ?? null);
   }, []);
 
+  /**
+   * O callback do `onAuthStateChange` só mexe em estado local — nada de
+   * `await` nem de chamada ao Supabase aqui dentro.
+   *
+   * Há um deadlock conhecido no supabase-js: o callback roda com o lock de
+   * auth segurado, então qualquer chamada ao client lá dentro trava esse
+   * lock e a PRÓXIMA chamada em qualquer lugar do app nunca retorna. O
+   * sintoma é traiçoeiro por ser intermitente — a sessão entra, o app até
+   * grava no banco, mas o perfil fica null e a Home mostra a persona
+   * errada. Ver supabase/auth-js#762.
+   */
   useEffect(() => {
     let vivo = true;
 
     // Sessão persistida no Keychain, lida antes de decidir a rota inicial.
     supabase.auth
       .getSession()
-      .then(async ({ data }) => {
-        if (!vivo) return;
-        setSession(data.session);
-        await carregaPerfil(data.session?.user.id);
-      })
+      .then(({ data }) => vivo && setSession(data.session))
       .finally(() => vivo && setLoading(false));
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_evento, nova) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_evento, nova) => {
       if (!vivo) return;
       setSession(nova);
-      await carregaPerfil(nova?.user.id);
       setLoading(false);
     });
 
@@ -63,7 +82,16 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       vivo = false;
       sub.subscription.unsubscribe();
     };
-  }, [carregaPerfil]);
+  }, []);
+
+  // O perfil carrega FORA do callback de auth, reagindo ao id da sessão.
+  useEffect(() => {
+    let vivo = true;
+    carregaPerfil(session?.user.id).catch(() => vivo && setProfile(null));
+    return () => {
+      vivo = false;
+    };
+  }, [session?.user.id, carregaPerfil]);
 
   // Marca presença — o perfil mostra "visto por último", e o motor de
   // vagas usa isso para priorizar quem anda ativo.
