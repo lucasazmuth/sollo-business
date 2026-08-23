@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Wordmark } from "@/src/components/Logo";
+import { LARGURA_CONTEUDO, useEhDesktop } from "@/src/lib/layout";
 import { colors, space, type } from "@/src/theme/tokens";
 
 type Props = {
@@ -50,11 +51,16 @@ export function Screen({
   contentStyle
 }: Props) {
   const router = useRouter();
+  const desktop = useEhDesktop();
 
   const body = (
     <View
       style={[
         scroll ? styles.bodyScroll : styles.body,
+        // Sem teto, no navegador o corpo sangra de ponta a ponta: um botão
+        // de 1300px de largura não parece clicável e a linha de texto passa
+        // de 200 caracteres. O celular não muda.
+        desktop && styles.bodyDesktop,
         contentStyle
       ]}
     >
@@ -67,7 +73,7 @@ export function Screen({
       {/* No fluxo, não absoluto: como irmão do KeyboardAvoidingView (flex:1)
           o botão ficava coberto por ele e os toques não chegavam. */}
       {(back || logo || right) && (
-        <View style={styles.barraVoltar}>
+        <View style={[styles.barraVoltar, desktop && styles.barraDesktop]}>
           {back ? (
             <Pressable
               onPress={() => router.back()}
@@ -116,6 +122,7 @@ const styles = StyleSheet.create({
   body: { flex: 1, paddingHorizontal: space.xl, paddingBottom: space.xl },
   // Em ScrollView o corpo cresce com o conteúdo em vez de travar na viewport.
   bodyScroll: { flexGrow: 1, paddingHorizontal: space.xl, paddingBottom: space.xl },
+  bodyDesktop: { width: "100%", maxWidth: LARGURA_CONTEUDO, alignSelf: "center" },
   barraVoltar: {
     flexDirection: "row",
     alignItems: "center",
@@ -124,6 +131,9 @@ const styles = StyleSheet.create({
     paddingTop: space.md,
     paddingBottom: space.sm
   },
+  // A fileira do topo acompanha o teto do corpo, senão o sininho vai parar
+  // na borda direita da janela, longe do conteúdo que ele acompanha.
+  barraDesktop: { width: "100%", maxWidth: LARGURA_CONTEUDO, alignSelf: "center" },
   back: {
     width: 44,
     height: 44,

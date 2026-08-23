@@ -15,6 +15,7 @@ import { Button } from "@/src/components/Button";
 import { VagaCard } from "@/src/components/VagaCard";
 import { NotificationBell } from "@/src/components/NotificationBell";
 import { FiltrosVagasModal } from "@/src/components/FiltrosVagasModal";
+import { LARGURA_CONTEUDO, useEhDesktop, useGradeCards } from "@/src/lib/layout";
 import { Wordmark } from "@/src/components/Logo";
 import { useSession } from "@/src/lib/session";
 import { buscarFeed, contarNoRaio, type VagaDoFeed } from "@/src/api/feed";
@@ -25,6 +26,8 @@ import { colors, radius, space, type } from "@/src/theme/tokens";
 export function FeedProfissional() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const desktop = useEhDesktop();
+  const { colunas, larguraCard } = useGradeCards(space.md, space.xl);
   const { session, profile } = useSession();
   const userId = session?.user.id;
 
@@ -102,12 +105,13 @@ export function FeedProfissional() {
           aqui na mão, no mesmo lugar em que o `Screen` a desenha. O sininho
           mora aqui, e não junto do título: ao lado do FILTROS ele espremia
           a contagem de vagas a ponto de truncar ("4 oportunida..."). */}
-      <View style={styles.barraTopo}>
-        <Wordmark width={78} />
+      <View style={[styles.barraTopo, desktop && styles.contido]}>
+        {/* Em desktop a marca já está no rail; repetir aqui seria ruído. */}
+        {desktop ? <View /> : <Wordmark width={78} />}
         <NotificationBell />
       </View>
 
-      <View style={styles.cabecalho}>
+      <View style={[styles.cabecalho, desktop && styles.contido]}>
         <View style={styles.tituloLinha}>
           <View style={{ flex: 1 }}>
             <Text style={styles.eyebrow}>
@@ -132,7 +136,11 @@ export function FeedProfissional() {
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.lista, { paddingBottom: insets.bottom + space["3xl"] }]}
+        contentContainerStyle={[
+          styles.lista,
+          desktop && styles.contido,
+          { paddingBottom: insets.bottom + space["3xl"] }
+        ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -177,15 +185,21 @@ export function FeedProfissional() {
             )}
           </View>
         ) : (
-          vagas.map((v, i) => (
-            <Animated.View key={v.id} entering={FadeInDown.delay(Math.min(i, 6) * 60).duration(420)}>
-              <VagaCard
-                vaga={v}
-                jaAplicou={aplicadas.has(v.id)}
-                onPress={() => router.push(`/(app)/vaga/${v.id}`)}
-              />
-            </Animated.View>
-          ))
+          <View style={[styles.grade, colunas > 1 && styles.gradeColunas]}>
+            {vagas.map((v, i) => (
+              <Animated.View
+                key={v.id}
+                entering={FadeInDown.delay(Math.min(i, 6) * 60).duration(420)}
+                style={larguraCard ? { width: larguraCard } : undefined}
+              >
+                <VagaCard
+                  vaga={v}
+                  jaAplicou={aplicadas.has(v.id)}
+                  onPress={() => router.push(`/(app)/vaga/${v.id}`)}
+                />
+              </Animated.View>
+            ))}
+          </View>
         )}
       </ScrollView>
 
@@ -240,6 +254,11 @@ const styles = StyleSheet.create({
 
 
   lista: { padding: space.xl, gap: space.md },
+  contido: { width: "100%", maxWidth: LARGURA_CONTEUDO, alignSelf: "center" },
+  grade: { gap: space.md },
+  // `gap` no contêiner cuida do respiro; o negative-margin clássico não é
+  // necessário porque a base já desconta o próprio gap no flexbox do RN.
+  gradeColunas: { flexDirection: "row", flexWrap: "wrap", alignItems: "flex-start" },
   centro: { paddingVertical: space["3xl"], alignItems: "center" },
 
   aviso: {
