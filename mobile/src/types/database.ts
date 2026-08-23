@@ -141,6 +141,7 @@ export type Database = {
       dados_pessoais: {
         Row: {
           bairro: string | null
+          base_point: unknown | null
           cep: string | null
           cidade: string | null
           complemento: string | null
@@ -156,6 +157,7 @@ export type Database = {
         }
         Insert: {
           bairro?: string | null
+          base_point?: unknown | null
           cep?: string | null
           cidade?: string | null
           complemento?: string | null
@@ -171,6 +173,7 @@ export type Database = {
         }
         Update: {
           bairro?: string | null
+          base_point?: unknown | null
           cep?: string | null
           cidade?: string | null
           complemento?: string | null
@@ -625,7 +628,7 @@ export type Database = {
       professional_profiles: {
         Row: {
           base_label: string | null
-          base_point: unknown
+          base_definida: boolean
           categorias: string[]
           created_at: string
           disponivel: boolean
@@ -639,7 +642,7 @@ export type Database = {
         }
         Insert: {
           base_label?: string | null
-          base_point?: unknown
+          base_definida?: boolean
           categorias?: string[]
           created_at?: string
           disponivel?: boolean
@@ -653,7 +656,7 @@ export type Database = {
         }
         Update: {
           base_label?: string | null
-          base_point?: unknown
+          base_definida?: boolean
           categorias?: string[]
           created_at?: string
           disponivel?: boolean

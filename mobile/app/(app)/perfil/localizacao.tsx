@@ -38,7 +38,7 @@ export default function Localizacao() {
         if (!vivo || !p?.professional) return;
         setRaio(p.professional.raio_km ?? 30);
         setLabel(p.professional.base_label);
-        setJaDefinido(!!p.professional.base_point);
+        setJaDefinido(p.professional.base_definida);
       })
       .finally(() => vivo && setCarregando(false));
 

@@ -50,7 +50,10 @@ export function FeedProfissional() {
     if (!userId) return;
 
     const perfil = await buscarPerfil(userId);
-    const base = !!perfil?.professional?.base_point;
+    // `base_definida` em vez da coordenada: o app só precisa saber SE a base
+    // existe, e ler o ponto pra isso era o que obrigava a expor a
+    // localização de todo mundo na tabela-vitrine.
+    const base = !!perfil?.professional?.base_definida;
     setTemBase(base);
     if (!base) {
       setVagas([]);
