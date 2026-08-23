@@ -13,16 +13,20 @@ import { colors, radius, space, type } from "@/src/theme/tokens";
  * criou a conta mas ainda não há sessão. Confirma por código (não link) —
  * mesmo mecanismo pras duas personas.
  *
- * TAMANHO_CODIGO precisa bater com "Number of characters used in the
- * email OTP" no Auth do projeto Supabase (Dashboard → Authentication →
- * Providers → Email). Testado direto na API: este projeto está com 8,
- * não o padrão de 6 — usar 6 aqui faz o Supabase recusar até o código
- * certo com "Token has expired or is invalid", porque o app manda só
- * os 6 primeiros dígitos de um código de 8.
+ * ⚠️ TAMANHO_CODIGO precisa bater com `mailer_otp_length` do projeto
+ * (Dashboard → Authentication → Providers → Email → "Number of characters
+ * used in the email OTP"). Se os dois divergirem, o app manda um pedaço do
+ * código e o Supabase recusa até o código certo — com a mensagem genérica
+ * "Token has expired or is invalid", que parece código errado e esconde a
+ * causa real. Já aconteceu: o projeto estava em 8 e o app em 6.
  */
-const TAMANHO_CODIGO = 8;
+const TAMANHO_CODIGO = 6;
 
-/** Menor tamanho aceito no botão — cobre projetos configurados com 6. */
+/**
+ * Piso do botão "Confirmar". Deixar o botão livre a partir daqui evita que
+ * uma mudança de `mailer_otp_length` no painel transforme a tela em beco
+ * sem saída antes de alguém atualizar o app.
+ */
 const MINIMO_CODIGO = 6;
 
 export default function ConfirmarEmail() {
