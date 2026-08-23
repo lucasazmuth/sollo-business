@@ -1277,6 +1277,35 @@ body.menu-open .nav__toggle span:nth-child(2) { transform: translate(-50%, -4.5p
 .legal a { color: var(--magenta); }
 .legal strong { color: var(--white); }
 
+.legal__toc {
+  margin: 2rem 0 1rem;
+  padding: 1.4rem 1.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.legal__tocTitulo {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.8rem;
+}
+.legal__toc ol {
+  columns: 1;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.legal__toc li { margin-bottom: 0.35rem; font-size: 0.9rem; }
+.legal__toc a { color: var(--ink-dim); text-decoration: none; }
+.legal__toc a:hover { color: var(--magenta); }
+
+@media (min-width: 640px) {
+  .legal__toc ol { columns: 2; column-gap: 2rem; }
+}
+
 /* ---------- Preferência de movimento reduzido ---------- */
 @media (prefers-reduced-motion: reduce) {
   *,
