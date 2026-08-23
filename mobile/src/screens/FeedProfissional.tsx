@@ -6,7 +6,8 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
+  useWindowDimensions
 } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -27,6 +28,7 @@ const RAIOS = [10, 20, 30, 50, 100];
 export function FeedProfissional() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { height: alturaTela } = useWindowDimensions();
   const { session, profile } = useSession();
   const userId = session?.user.id;
 
@@ -132,8 +134,21 @@ export function FeedProfissional() {
           </Pressable>
         </View>
 
+        {/* O painel vive no cabeçalho fixo, acima da lista. Com duas dezenas
+            de categorias ele passava da altura da tela e não havia o que
+            rolar: os últimos chips (inclusive "Só urgentes") ficavam
+            inalcançáveis. Teto de altura + rolagem própria resolve sem
+            empurrar o feed para fora de vista. */}
         {filtrosAbertos && (
-          <Animated.View entering={FadeIn.duration(220)} style={styles.filtros}>
+          <Animated.View
+            entering={FadeIn.duration(220)}
+            style={[styles.filtros, { maxHeight: alturaTela * 0.42 }]}
+          >
+            <ScrollView
+              contentContainerStyle={styles.filtrosConteudo}
+              nestedScrollEnabled
+              keyboardShouldPersistTaps="handled"
+            >
             <Text style={styles.filtroRotulo}>RAIO</Text>
             <View style={styles.filtroLinha}>
               <Chip
@@ -176,6 +191,7 @@ export function FeedProfissional() {
                 onPress={() => setApenasUrgentes((v) => !v)}
               />
             </View>
+            </ScrollView>
           </Animated.View>
         )}
       </View>
@@ -274,7 +290,8 @@ const styles = StyleSheet.create({
   botaoFiltroAtivo: { borderColor: colors.magenta, backgroundColor: "rgba(216,19,104,0.12)" },
   botaoFiltroTexto: { ...type.label, fontSize: 10, color: colors.inkDim },
 
-  filtros: { gap: space.sm, marginTop: space.lg },
+  filtros: { marginTop: space.lg },
+  filtrosConteudo: { gap: space.sm, paddingBottom: space.sm },
   filtroRotulo: { ...type.label, fontSize: 9, color: colors.inkFaint, marginTop: space.sm },
   filtroLinha: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
 
