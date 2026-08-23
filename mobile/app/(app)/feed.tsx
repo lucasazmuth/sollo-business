@@ -1,0 +1,270 @@
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button } from "@/src/components/Button";
+import { Chip } from "@/src/components/Chip";
+import { VagaCard } from "@/src/components/VagaCard";
+import { useSession } from "@/src/lib/session";
+import { buscarFeed, contarNoRaio, type VagaDoFeed } from "@/src/api/feed";
+import { buscarPerfil, listarCategorias, type Category } from "@/src/api/profile";
+import { idsDasVagasQueAplicei } from "@/src/api/applications";
+import { colors, radius, space, type } from "@/src/theme/tokens";
+
+const RAIOS = [10, 20, 30, 50, 100];
+
+export default function Feed() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { session, profile } = useSession();
+  const userId = session?.user.id;
+
+  const [vagas, setVagas] = useState<VagaDoFeed[]>([]);
+  const [categorias, setCategorias] = useState<Category[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [atualizando, setAtualizando] = useState(false);
+  const [temBase, setTemBase] = useState<boolean | null>(null);
+  const [alemDoRaio, setAlemDoRaio] = useState(0);
+  const [aplicadas, setAplicadas] = useState<Set<string>>(new Set());
+
+  const [raio, setRaio] = useState<number | null>(null); // null = raio do perfil
+  const [categoriaFiltro, setCategoriaFiltro] = useState<string | null>(null);
+  const [apenasUrgentes, setApenasUrgentes] = useState(false);
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+
+  useEffect(() => {
+    listarCategorias().then(setCategorias);
+  }, []);
+
+  const carregar = useCallback(async () => {
+    if (!userId) return;
+
+    const perfil = await buscarPerfil(userId);
+    const base = !!perfil?.professional?.base_point;
+    setTemBase(base);
+    if (!base) {
+      setVagas([]);
+      return;
+    }
+
+    setAplicadas(await idsDasVagasQueAplicei(userId));
+
+    const resultado = await buscarFeed({
+      raioKm: raio,
+      categorias: categoriaFiltro ? [categoriaFiltro] : null,
+      apenasUrgentes
+    });
+    setVagas(resultado);
+
+    // Vazio? Descobre se aumentar o raio resolveria.
+    if (resultado.length === 0) {
+      setAlemDoRaio(await contarNoRaio(100));
+    }
+  }, [userId, raio, categoriaFiltro, apenasUrgentes]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let vivo = true;
+      carregar()
+        .catch(() => {})
+        .finally(() => vivo && setCarregando(false));
+      return () => {
+        vivo = false;
+      };
+    }, [carregar])
+  );
+
+  async function puxarParaAtualizar() {
+    setAtualizando(true);
+    await carregar().catch(() => {});
+    setAtualizando(false);
+  }
+
+  const raioEfetivo = raio ?? 30;
+  const filtrosAtivos = (raio !== null ? 1 : 0) + (categoriaFiltro ? 1 : 0) + (apenasUrgentes ? 1 : 0);
+
+  return (
+    <View style={styles.root}>
+      <View style={[styles.cabecalho, { paddingTop: insets.top + space.md }]}>
+        <View style={styles.tituloLinha}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.eyebrow}>
+              <Text style={styles.dot}>● </Text>VAGAS PERTO DE VOCÊ
+            </Text>
+            <Text style={styles.titulo} numberOfLines={1}>
+              {vagas.length > 0
+                ? `${vagas.length} oportunidade${vagas.length > 1 ? "s" : ""}`
+                : "Feed"}
+            </Text>
+          </View>
+
+          <Pressable
+            onPress={() => setFiltrosAbertos((v) => !v)}
+            style={[styles.botaoFiltro, filtrosAtivos > 0 && styles.botaoFiltroAtivo]}
+          >
+            <Text style={[styles.botaoFiltroTexto, filtrosAtivos > 0 && { color: colors.white }]}>
+              FILTROS{filtrosAtivos > 0 ? ` · ${filtrosAtivos}` : ""}
+            </Text>
+          </Pressable>
+        </View>
+
+        {filtrosAbertos && (
+          <Animated.View entering={FadeIn.duration(220)} style={styles.filtros}>
+            <Text style={styles.filtroRotulo}>RAIO</Text>
+            <View style={styles.filtroLinha}>
+              <Chip
+                label="Meu raio"
+                selecionado={raio === null}
+                onPress={() => setRaio(null)}
+              />
+              {RAIOS.map((r) => (
+                <Chip
+                  key={r}
+                  label={`${r} km`}
+                  selecionado={raio === r}
+                  onPress={() => setRaio(r)}
+                />
+              ))}
+            </View>
+
+            <Text style={styles.filtroRotulo}>CATEGORIA</Text>
+            <View style={styles.filtroLinha}>
+              <Chip
+                label="Minhas"
+                selecionado={categoriaFiltro === null}
+                onPress={() => setCategoriaFiltro(null)}
+              />
+              {categorias.map((c) => (
+                <Chip
+                  key={c.id}
+                  label={c.nome}
+                  selecionado={categoriaFiltro === c.id}
+                  onPress={() => setCategoriaFiltro(categoriaFiltro === c.id ? null : c.id)}
+                />
+              ))}
+            </View>
+
+            <View style={styles.filtroLinha}>
+              <Chip
+                label="Só urgentes"
+                tom="lime"
+                selecionado={apenasUrgentes}
+                onPress={() => setApenasUrgentes((v) => !v)}
+              />
+            </View>
+          </Animated.View>
+        )}
+      </View>
+
+      <ScrollView
+        contentContainerStyle={[styles.lista, { paddingBottom: insets.bottom + space["3xl"] }]}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={atualizando}
+            onRefresh={puxarParaAtualizar}
+            tintColor={colors.magenta}
+          />
+        }
+      >
+        {carregando ? (
+          <View style={styles.centro}>
+            <ActivityIndicator color={colors.magenta} />
+          </View>
+        ) : temBase === false ? (
+          <View style={styles.aviso}>
+            <Text style={styles.avisoTitulo}>Defina onde você atua</Text>
+            <Text style={styles.avisoTexto}>
+              Sem sua base e o raio, não temos como mostrar o que está perto nem te avisar de vaga
+              urgente na região.
+            </Text>
+            <Button
+              label="Definir agora"
+              onPress={() => router.push("/(app)/perfil/localizacao")}
+              style={{ marginTop: space.lg }}
+            />
+          </View>
+        ) : vagas.length === 0 ? (
+          <View style={styles.aviso}>
+            <Text style={styles.avisoTitulo}>Nada por aqui ainda</Text>
+            <Text style={styles.avisoTexto}>
+              {alemDoRaio > 0
+                ? `Não há vaga dentro de ${raioEfetivo} km com esses filtros, mas existem ${alemDoRaio} até 100 km. Aumente o raio.`
+                : "Nenhuma vaga aberta na sua região agora. Deixe as notificações ligadas: avisamos assim que surgir."}
+            </Text>
+            {alemDoRaio > 0 && (
+              <Button
+                label="Ampliar para 100 km"
+                variant="ghost"
+                onPress={() => setRaio(100)}
+                style={{ marginTop: space.lg }}
+              />
+            )}
+          </View>
+        ) : (
+          vagas.map((v, i) => (
+            <Animated.View key={v.id} entering={FadeInDown.delay(Math.min(i, 6) * 60).duration(420)}>
+              <VagaCard
+                vaga={v}
+                jaAplicou={aplicadas.has(v.id)}
+                onPress={() => router.push(`/(app)/vaga/${v.id}`)}
+              />
+            </Animated.View>
+          ))
+        )}
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: colors.bg },
+
+  cabecalho: {
+    paddingHorizontal: space.xl,
+    paddingBottom: space.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line
+  },
+  tituloLinha: { flexDirection: "row", alignItems: "flex-end", gap: space.md },
+  eyebrow: { ...type.label, color: colors.inkDim },
+  dot: { color: colors.magenta },
+  titulo: { ...type.h2, color: colors.white, marginTop: space.sm },
+
+  botaoFiltro: {
+    paddingVertical: space.sm + 2,
+    paddingHorizontal: space.lg,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.line
+  },
+  botaoFiltroAtivo: { borderColor: colors.magenta, backgroundColor: "rgba(216,19,104,0.12)" },
+  botaoFiltroTexto: { ...type.label, fontSize: 10, color: colors.inkDim },
+
+  filtros: { gap: space.sm, marginTop: space.lg },
+  filtroRotulo: { ...type.label, fontSize: 9, color: colors.inkFaint, marginTop: space.sm },
+  filtroLinha: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
+
+  lista: { padding: space.xl, gap: space.md },
+  centro: { paddingVertical: space["3xl"], alignItems: "center" },
+
+  aviso: {
+    gap: space.sm,
+    padding: space.xl,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: colors.lineStrong
+  },
+  avisoTitulo: { ...type.h3, color: colors.white },
+  avisoTexto: { ...type.body, color: colors.inkDim }
+});
