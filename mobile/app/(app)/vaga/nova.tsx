@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
@@ -9,9 +9,10 @@ import { Input } from "@/src/components/Input";
 import { Chip } from "@/src/components/Chip";
 import { EnderecoInput, type LocalResolvido } from "@/src/components/EnderecoInput";
 import { DataHoraInput, horasAte } from "@/src/components/DataHoraInput";
+import { DestacarVagaModal } from "@/src/components/DestacarVagaModal";
 import { useSession } from "@/src/lib/session";
 import { escolherImagem, enviarImagem, MediaError } from "@/src/lib/media";
-import { listarCategorias, type Category } from "@/src/api/profile";
+import { listarCategorias, cadastroCompletoParaPublicar, type Category } from "@/src/api/profile";
 import { alcanceDaVaga, criarVaga } from "@/src/api/jobs";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
@@ -43,10 +44,29 @@ export default function NovaVaga() {
   const [urgenteManual, setUrgenteManual] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [erros, setErros] = useState<Record<string, string>>({});
+  const [destacarAberto, setDestacarAberto] = useState(false);
+  const [cadastroCompleto, setCadastroCompleto] = useState<boolean | null>(null);
+
+  const emailConfirmado = !!session?.user.email_confirmed_at;
 
   useEffect(() => {
     listarCategorias().then(setCategorias);
   }, []);
+
+  // Recheca sempre que a tela ganha foco — cobre o caso de voltar de
+  // "completar cadastro" com os dados recém-salvos.
+  useFocusEffect(
+    useCallback(() => {
+      if (!userId) return;
+      let vivo = true;
+      cadastroCompletoParaPublicar(userId)
+        .then((ok) => vivo && setCadastroCompleto(ok))
+        .catch(() => vivo && setCadastroCompleto(false));
+      return () => {
+        vivo = false;
+      };
+    }, [userId])
+  );
 
   // Vaga em até 72h é urgente por definição — o banco infere igual.
   const urgentePorPrazo = horasAte(inicio) <= 72;
@@ -133,6 +153,52 @@ export default function NovaVaga() {
           <Text style={styles.bloqueioTexto}>
             Sua conta é de profissional. Dá para mudar isso no seu perfil.
           </Text>
+        </View>
+      </Screen>
+    );
+  }
+
+  if (!emailConfirmado) {
+    return (
+      <Screen back scroll={false}>
+        <View style={styles.bloqueio}>
+          <Text style={styles.bloqueioTitulo}>Confirme seu e-mail antes</Text>
+          <Text style={styles.bloqueioTexto}>
+            É por ele que avisamos sobre candidaturas. Confirme o código que mandamos no cadastro.
+          </Text>
+          <Button
+            label="Confirmar e-mail"
+            onPress={() => router.push("/(auth)/confirmar-email")}
+            style={{ marginTop: space.lg }}
+          />
+        </View>
+      </Screen>
+    );
+  }
+
+  if (cadastroCompleto === false) {
+    return (
+      <Screen back scroll={false}>
+        <View style={styles.bloqueio}>
+          <Text style={styles.bloqueioTitulo}>Complete seu cadastro antes</Text>
+          <Text style={styles.bloqueioTexto}>
+            Nome completo, CPF, telefone e endereço — pedimos uma vez só, antes da primeira vaga.
+          </Text>
+          <Button
+            label="Completar cadastro"
+            onPress={() => router.push("/(app)/perfil/completar-cadastro")}
+            style={{ marginTop: space.lg }}
+          />
+        </View>
+      </Screen>
+    );
+  }
+
+  if (cadastroCompleto === null) {
+    return (
+      <Screen back scroll={false}>
+        <View style={styles.centro}>
+          <ActivityIndicator color={colors.magenta} />
         </View>
       </Screen>
     );
@@ -281,7 +347,17 @@ export default function NovaVaga() {
             ))}
           </View>
         </View>
+
+        <Pressable style={styles.destacar} onPress={() => setDestacarAberto(true)}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.label}>DESTACAR VAGA · R$ 7,90</Text>
+            <Text style={styles.ajuda}>7 dias no topo do feed. Opcional.</Text>
+          </View>
+          <Text style={styles.destacarSeta}>›</Text>
+        </Pressable>
       </View>
+
+      <DestacarVagaModal visivel={destacarAberto} onFechar={() => setDestacarAberto(false)} />
 
       <View style={styles.rodape}>
         <Button
@@ -356,10 +432,23 @@ const styles = StyleSheet.create({
   qtdAtiva: { borderColor: colors.magenta, backgroundColor: "rgba(216,19,104,0.12)" },
   qtdTexto: { ...type.bodyMedium, color: colors.inkDim },
 
+  destacar: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.md,
+    padding: space.lg,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: colors.lineStrong
+  },
+  destacarSeta: { ...type.h2, color: colors.inkFaint },
+
   rodape: { marginTop: space["2xl"], gap: space.sm, paddingBottom: space.lg },
   rodapeAjuda: { ...type.caption, color: colors.inkFaint, textAlign: "center" },
 
   bloqueio: { flex: 1, justifyContent: "center", gap: space.md },
   bloqueioTitulo: { ...type.h2, color: colors.white },
-  bloqueioTexto: { ...type.body, color: colors.inkDim }
+  bloqueioTexto: { ...type.body, color: colors.inkDim },
+  centro: { flex: 1, alignItems: "center", justifyContent: "center" }
 });

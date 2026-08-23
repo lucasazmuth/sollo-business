@@ -73,7 +73,24 @@ export async function salvarPerfilProfissional(
 
 export async function salvarPerfilContratante(
   profileId: string,
-  campos: Partial<Pick<HirerProfile, "empresa" | "sobre" | "site" | "logo_url">>
+  campos: Partial<
+    Pick<
+      HirerProfile,
+      | "empresa"
+      | "sobre"
+      | "site"
+      | "logo_url"
+      | "nome_completo"
+      | "cpf"
+      | "cep"
+      | "logradouro"
+      | "numero"
+      | "complemento"
+      | "bairro"
+      | "cidade"
+      | "uf"
+    >
+  >
 ) {
   await comRetry(async () => {
     const { error } = await supabase
@@ -82,6 +99,15 @@ export async function salvarPerfilContratante(
       .eq("profile_id", profileId);
     if (error) throw new Error(error.message);
   });
+}
+
+/** Publicar vaga exige e-mail verificado, nome completo, CPF, telefone e endereço. */
+export async function cadastroCompletoParaPublicar(profileId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc("hirer_cadastro_completo", {
+    p_profile_id: profileId
+  });
+  if (error) throw new Error(error.message);
+  return !!data;
 }
 
 /**

@@ -1,7 +1,8 @@
 # Sollo Business — PRD do MVP
 
-**Versão:** 1.0 · **Data:** 21/08/2026 · **Status:** aprovado para execução
-**Escopo desta versão:** app mobile (iOS + Android) **sem pagamentos**
+**Versão:** 1.1 · **Data:** 22/08/2026 · **Status:** aprovado para execução
+**Escopo desta versão:** app mobile (iOS + Android) **sem pagamento pelo serviço prestado** — a
+única cobrança é o destaque opcional de vaga (§6.1)
 
 ---
 
@@ -103,7 +104,7 @@ por não ter visto a mensagem. Portfólio espalhado entre Instagram e Drive.
 
 | Não entra | Motivo |
 | --- | --- |
-| Pagamento, PIX, escrow, comissão, reembolso | Muda o produto de "encontro" para "financeiro": exige antifraude, contas de pagamento, tributação e suporte. Adia o lançamento em meses. Sem tráfego, não há o que intermediar. |
+| Pagamento pelo serviço prestado (escrow, comissão, reembolso) | Muda o produto de "encontro" para "financeiro": exige antifraude, contas de pagamento, tributação e suporte. Adia o lançamento em meses. Sem tráfego, não há o que intermediar. |
 | Orçamentos com itens e margem | Só faz sentido acoplado a pagamento |
 | Drive de arquivos, gestão de projetos e equipes | Ferramenta de operação, não de descoberta. Não resolve a dor central |
 | Painel web do contratante | Publicação acontece no celular, correndo. Web é conforto, não necessidade |
@@ -111,9 +112,14 @@ por não ter visto a mensagem. Portfólio espalhado entre Instagram e Drive.
 | Emissão de nota fiscal | Fica só o campo "exige nota" para filtro |
 | Taxonomia de 200+ serviços | Começar com ~20 categorias. Taxonomia grande com base pequena fragmenta o feed e mata a liquidez |
 
-> ⚠️ **A landing atual promete o que o MVP não entrega** — pagamento via PIX, garantia de 100% de
-> reembolso e comissão de 5%. A copy será ajustada antes do lançamento para não criar expectativa
-> que o produto não cumpre.
+### 6.1 A única exceção: destaque pago
+
+O MVP não intermedia o pagamento **pelo serviço prestado** (item acima), mas cobra por um recurso
+de visibilidade: o contratante pode pagar **R$ 7,90, via PIX (Asaas), pagamento único**, para que
+a vaga fique no topo do feed por **7 dias**. Não é escrow nem comissão — é uma cobrança direta pela
+plataforma, sem envolver o pagamento do profissional. Na versão inicial do app, o botão de destacar
+mostra a oferta mas ainda não processa pagamento de verdade (Asaas não integrado): aparece um aviso
+de "em breve" até a integração entrar.
 
 ---
 

@@ -30,33 +30,40 @@ app/                        rotas (expo-router, file-based)
     confirmar-email.tsx     aguarda confirmação após o cadastro
   (app)/
     _layout.tsx             guarda de rota: sem sessão, volta para auth
-    home.tsx                placeholder da área logada
-    perfil/index.tsx        vitrine: avatar, métricas, categorias, portfólio
+    (tabs)/
+      _layout.tsx           Tabs do expo-router, tab bar própria (ver TabBar.tsx)
+      home.tsx              Início: dashboard por tipo de conta
+      vagas.tsx              feed (profissional) ou minhas vagas (contratante) — mesma rota
+      conversas.tsx          lista de conversas
+      perfil.tsx              vitrine: avatar, métricas, categorias, portfólio
+    perfil/completar-cadastro.tsx  nome, CPF, telefone, endereço — trava antes de publicar
     perfil/editar.tsx       edição + upload de avatar e portfólio
     perfil/localizacao.tsx  base por GPS e raio de atuação
-    feed.tsx                feed do profissional: raio, categoria, urgência
-    vagas.tsx               minhas vagas (contratante)
-    vaga/nova.tsx           publicar vaga
-    vaga/[id]/index.tsx     detalhe, alcance, candidatura e cancelamento
+    perfil/configuracoes.tsx  sair, preferências, excluir conta
+    vaga/nova.tsx           publicar vaga (+ destacar, opcional)
+    vaga/[id]/index.tsx     detalhe, alcance, candidatura, cancelamento, destacar
     vaga/[id]/candidatos.tsx  lista, seleção e recusa (contratante)
     candidaturas.tsx        minhas candidaturas (profissional)
     perfil/[id].tsx         perfil público de outra pessoa
-    notificacoes/index.tsx  inbox
+    notificacoes/index.tsx  inbox (alcançada pelo sininho no header das abas)
     notificacoes/preferencias.tsx  canais, teto diário, silêncio
-    conversas.tsx           lista de conversas
     conversa/[id].tsx       chat 1:1 (realtime)
     avaliacoes/index.tsx    avaliações pendentes
     avaliacoes/[jobId]/[ratedId].tsx  formulário de avaliação
 src/
   theme/tokens.ts           cores, espaçamento, raios, tipografia
-  theme/logo.ts             paths SVG do logotipo (os mesmos da web)
+  theme/logo.ts              paths SVG do logotipo (os mesmos da web)
   components/               Logo, Button, Input, Screen, Avatar, Chip,
-                            EnderecoInput, DataHoraInput, VagaCard
+                            EnderecoInput, DataHoraInput, VagaCard, TabBar, TabIcons,
+                            NotificationBell, PinInput, DestacarVagaModal
+  screens/                  telas grandes reaproveitadas por rota (FeedProfissional,
+                            MinhasVagasContratante — ver vagas.tsx)
   api/profile.ts            queries e mutações de perfil (com retry)
   api/jobs.ts               criar, publicar, cancelar e listar vagas
   api/feed.ts               feed por raio (RPC jobs_feed_para_mim)
   api/applications.ts       candidatar, retirar, selecionar, recusar
   api/notifications.ts      inbox e preferências
+  lib/cpf.ts                 formata e valida CPF (dígito verificador)
   lib/notifications.ts      registro de token Expo e deep link
   lib/media.ts              escolher e enviar imagem para o Storage
   lib/retry.ts              retentativa para falha transitória de rede
@@ -401,11 +408,82 @@ da conta tem:
 6. Ficha da loja: descrição, screenshots, categoria, classificação indicativa, política de
    privacidade (usar a URL acima nos dois consoles).
 
+## Navegação: tab bar, sininho, casca do app
+
+O app não tinha estrutura de navegação de verdade: `home.tsx` era uma lista vertical de botões, e
+duas telas (`feed.tsx`, `notificacoes/index.tsx`) eram becos sem saída — sem botão voltar, sem
+gesto, dependendo só do fato de estarem uma raiz de navegação.
+
+Virou uma casca de `Tabs` do expo-router com 4 abas (`mobile/app/(app)/(tabs)/`): **Início**
+(dashboard por tipo de conta), **Vagas** (feed do profissional ou "minhas vagas" do contratante,
+mesma rota `/vagas` decidindo o conteúdo em runtime por `profile.tipo` — não dá pra declarar dois
+`Tabs.Screen` condicionais no expo-router, então a decisão fica dentro do componente), **Conversas**
+e **Perfil**. Tab bar própria (`src/components/TabBar.tsx` + `src/components/TabIcons.tsx`, SVGs de
+traço único no mesmo estilo do `IconMark`) — não usa o visual nativo do react-navigation, nem
+`@expo/vector-icons` (o projeto nunca teve lib de ícone; não valia introduzir uma só pra 5 glifos).
+
+`Screen.tsx` ganhou uma prop `right` — mesma fileira que já existia pro botão voltar, agora também
+aceita uma ação à direita. É onde `NotificationBell.tsx` entra nas 4 telas raiz de aba, com contador
+de não lidas (reaproveita `contarNaoLidas()`, que já existia em `api/notifications.ts`, recarregado
+por `useFocusEffect` — sem realtime nesta fase). Tocar no sininho empurra pra `/notificacoes`, que
+deixou de ser uma tela sem saída: ganhou botão voltar de verdade.
+
+`feed.tsx` e `notificacoes/index.tsx` tinham o mesmo padrão de cabeçalho manual com
+`useSafeAreaInsets()` que já causou o bug do "elemento fantasma" (ver seção acima) — corrigido de
+brinde para `SafeAreaView`, preventivamente, já que essas telas nunca tinham sido revisitadas desde
+aquele fix.
+
+### Achado de passagem
+
+`(auth)/tipo-de-conta.tsx` ainda prometia "5% de comissão" e "pagamento garantido pela plataforma"
+pro contratante — sobra da copy anterior à Fase 9. Corrigido junto (agora reflete o destaque pago
+opcional, ver seção abaixo).
+
+## Destaque pago (R$ 7,90 / 7 dias)
+
+Única cobrança do MVP: o contratante paga uma vez, via PIX (Asaas), para a vaga ficar no topo do
+feed por 7 dias. O Asaas **não está integrado ainda** — o botão existe (na publicação e na vaga já
+publicada), mas abre `DestacarVagaModal.tsx`, que só mostra a oferta e avisa "em breve". Nenhuma
+chamada de API de pagamento, nenhuma gravação no banco.
+
+O terreno já está preparado pro dia em que a integração existir: `jobs.destacada_ate timestamptz`
+(migration `20260822020000_destaque_vaga.sql`) e `jobs_feed` ganhou um critério de ordenação **antes**
+do `is_urgent` — `(destacada_ate is not null and destacada_ate > now()) desc`. Com a coluna sempre
+null hoje, a ordenação atual não muda em nada na prática.
+
+## Cadastro completo do contratante + PIN de e-mail
+
+Publicar vaga passou a exigir e-mail confirmado, nome completo, CPF válido, telefone e endereço —
+`hirer_profiles` não tinha nenhum desses campos (migration `20260822030000_hirer_completo.sql`).
+
+**PIN substitui o link mágico**, pras duas personas, não só pro contratante: `verifyOtp` da própria
+lib do Supabase Auth, decidido assim porque manter dois mecanismos de confirmação (link pra um tipo
+de conta, código pro outro) seria complexidade sem ganho, e código tende a converter melhor que link
+em mobile. `(auth)/confirmar-email.tsx` foi reescrita: era "abra o link", virou um campo de 6 dígitos
+(`src/components/PinInput.tsx`, novo — caixas decorativas + um `TextInput` real invisível por cima,
+pra herdar autofill de código do SMS/e-mail de graça).
+
+⚠️ **Isso exige uma troca manual no Dashboard do Supabase** (Authentication → Email Templates →
+Confirm signup: trocar `{{ .ConfirmationURL }}` por `{{ .Token }}`) — não é algo que uma migration
+resolve. Até essa troca acontecer, o e-mail que sai continua sendo o link antigo, e `verifyOtp` não
+vai ter código nenhum pra validar.
+
+Trava em dois níveis: `vaga/nova.tsx` bloqueia a publicação com uma tela de "complete seu cadastro"
+antes do formulário (reaproveitando o mesmo padrão visual do bloqueio "só contratante publica" que
+já existia), levando pra `perfil/completar-cadastro.tsx` (CPF com dígito verificador validado em
+`src/lib/cpf.ts`, CEP com autocompletar via ViaCEP — API pública, sem chave). E a RLS de INSERT em
+`jobs` ganhou a mesma checagem como defesa (`hirer_cadastro_completo()` + `email_confirmado()`, duas
+novas funções `SECURITY DEFINER`, mesmo padrão de `is_job_owner`/`me_candidatei`) — mesmo que alguém
+contorne a checagem client-side, o banco recusa.
+
 ## Pendências
 
-1. **SMTP do Auth** — apontar para o Resend antes de abrir cadastro público.
-2. **Login social** (Google/Apple) — não implementado; Apple Sign In é exigido pela App Store
+1. **Template de e-mail do Supabase Auth** — trocar de link mágico para código (`{{ .Token }}`) no
+   Dashboard antes do PIN de confirmação funcionar de verdade (ver seção acima).
+2. **Integração com o Asaas** — o botão "Destacar vaga" está pronto na UI, falta o backend de
+   pagamento de verdade (webhook de confirmação de PIX, atualização de `destacada_ate`).
+3. **SMTP do Auth** — apontar para o Resend antes de abrir cadastro público.
+4. **Login social** (Google/Apple) — não implementado; Apple Sign In é exigido pela App Store
    se houver login social de terceiros.
-3. **Verificação de e-mail** e política de senha definitiva a combinar com o backend.
-4. **Domínio `www.sollo.business`** — os links de termos/privacidade assumem esse domínio; ajustar
+5. **Domínio `www.sollo.business`** — os links de termos/privacidade assumem esse domínio; ajustar
    se o domínio de produção mudar antes de builds de loja.

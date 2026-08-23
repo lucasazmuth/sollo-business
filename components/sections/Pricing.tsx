@@ -54,7 +54,7 @@ export function Pricing() {
         <Fade as="p" className="lead">
           Não precisa se preocupar com taxas escondidas. O cadastro é gratuito, tanto para
           profissionais quanto para contratantes, e não há cobrança para publicar vagas ou se
-          candidatar.
+          candidatar. A única cobrança da plataforma é opcional: destacar uma vaga no topo do feed.
         </Fade>
 
         <div className="pricing">

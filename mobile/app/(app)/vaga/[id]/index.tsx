@@ -6,6 +6,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
 import { Avatar } from "@/src/components/Avatar";
+import { DestacarVagaModal } from "@/src/components/DestacarVagaModal";
 import { useSession } from "@/src/lib/session";
 import { buscarVaga, cancelarVaga, alcanceDaVaga, type VagaDetalhe } from "@/src/api/jobs";
 import {
@@ -37,6 +38,7 @@ export default function DetalheVaga() {
   const [candidatura, setCandidatura] = useState<Application | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [enviando, setEnviando] = useState(false);
+  const [destacarAberto, setDestacarAberto] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -193,11 +195,18 @@ export default function DetalheVaga() {
       {podeGerir && (
         <View style={styles.acoes}>
           <Button label="Ver candidatos" onPress={() => router.push(`/(app)/vaga/${vaga.id}/candidatos`)} />
+          <Button
+            label="Destacar vaga · R$ 7,90"
+            variant="ghost"
+            onPress={() => setDestacarAberto(true)}
+          />
           <Pressable onPress={confirmarCancelamento} hitSlop={8} style={styles.linkPerigo}>
             <Text style={styles.linkPerigoTexto}>Cancelar vaga</Text>
           </Pressable>
         </View>
       )}
+
+      <DestacarVagaModal visivel={destacarAberto} onFechar={() => setDestacarAberto(false)} />
 
       {/* Candidatura: um toque, sem formulário. O perfil já é a inscrição. */}
       {souProfissional && !souDono && (
@@ -221,7 +230,7 @@ export default function DetalheVaga() {
               {candidatura!.status === "selecionada" && (
                 <Button
                   label="Abrir conversa"
-                  onPress={() => router.push("/(app)/conversas")}
+                  onPress={() => router.push("/conversas")}
                   style={{ marginTop: space.sm }}
                 />
               )}

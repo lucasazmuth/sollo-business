@@ -145,12 +145,12 @@ export const plans = [
   {
     label: "Para contratantes",
     price: "R$ 0",
-    note: "Modelo de cobrança em definição",
+    note: "Destaque opcional por R$ 7,90",
     accent: true,
     items: [
       "Sem limites de projetos",
       "Sem cobrança de criação de anúncios",
-      "Sem limites de candidatos aplicados"
+      "Destaque no topo do feed por 7 dias, via PIX"
     ]
   }
 ];
@@ -159,7 +159,11 @@ export const plans = [
 export const faq = [
   {
     q: "Quanto custa usar a Sollo Business?",
-    a: "O cadastro é gratuito para profissionais e contratantes. Não há cobrança por publicar vagas ou se candidatar."
+    a: "O cadastro é gratuito para profissionais e contratantes. Não há cobrança por publicar vagas ou se candidatar. A única cobrança é opcional: destacar uma vaga."
+  },
+  {
+    q: "O que é destacar uma vaga?",
+    a: "Por R$ 7,90, pagos uma vez via PIX, sua vaga fica no topo do feed de quem está no raio por 7 dias corridos. É opcional e não muda em nada a visibilidade normal da vaga."
   },
   {
     q: "Como funciona o pagamento pelo serviço?",

@@ -175,36 +175,63 @@ export type Database = {
       }
       hirer_profiles: {
         Row: {
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          complemento: string | null
+          cpf: string | null
           created_at: string
           empresa: string | null
           logo_url: string | null
+          logradouro: string | null
+          nome_completo: string | null
+          numero: string | null
           profile_id: string
           rating_avg: number | null
           rating_count: number
           site: string | null
           sobre: string | null
+          uf: string | null
           updated_at: string
         }
         Insert: {
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          cpf?: string | null
           created_at?: string
           empresa?: string | null
           logo_url?: string | null
+          logradouro?: string | null
+          nome_completo?: string | null
+          numero?: string | null
           profile_id: string
           rating_avg?: number | null
           rating_count?: number
           site?: string | null
           sobre?: string | null
+          uf?: string | null
           updated_at?: string
         }
         Update: {
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          cpf?: string | null
           created_at?: string
           empresa?: string | null
           logo_url?: string | null
+          logradouro?: string | null
+          nome_completo?: string | null
+          numero?: string | null
           profile_id?: string
           rating_avg?: number | null
           rating_count?: number
           site?: string | null
           sobre?: string | null
+          uf?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -225,6 +252,7 @@ export type Database = {
           cover_url: string | null
           created_at: string
           descricao: string
+          destacada_ate: string | null
           duracao_horas: number | null
           endereco_texto: string | null
           hirer_id: string
@@ -249,6 +277,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           descricao: string
+          destacada_ate?: string | null
           duracao_horas?: number | null
           endereco_texto?: string | null
           hirer_id: string
@@ -273,6 +302,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           descricao?: string
+          destacada_ate?: string | null
           duracao_horas?: number | null
           endereco_texto?: string | null
           hirer_id?: string
@@ -767,6 +797,7 @@ export type Database = {
         }[]
       }
       delete_own_account: { Args: never; Returns: undefined }
+      email_confirmado: { Args: never; Returns: boolean }
       emit_notification_event: {
         Args: {
           p_actor_id?: string
@@ -777,6 +808,10 @@ export type Database = {
         Returns: string
       }
       fui_selecionado: { Args: { p_job_id: string }; Returns: boolean }
+      hirer_cadastro_completo: {
+        Args: { p_profile_id: string }
+        Returns: boolean
+      }
       is_conversation_member: {
         Args: { p_conversation_id: string }
         Returns: boolean
