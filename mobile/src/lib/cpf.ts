@@ -28,3 +28,10 @@ export function cpfValido(valor: string): boolean {
   const d2 = digito(cpf.slice(0, 9) + d1);
   return cpf === cpf.slice(0, 9) + String(d1) + String(d2);
 }
+
+/** 00000-000 conforme digita. */
+export function formatarCep(valor: string): string {
+  const d = apenasDigitos(valor).slice(0, 8);
+  if (d.length <= 5) return d;
+  return `${d.slice(0, 5)}-${d.slice(5)}`;
+}

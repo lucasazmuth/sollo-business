@@ -15,6 +15,7 @@ import { Button } from "@/src/components/Button";
 import { Chip } from "@/src/components/Chip";
 import { VagaCard } from "@/src/components/VagaCard";
 import { NotificationBell } from "@/src/components/NotificationBell";
+import { Wordmark } from "@/src/components/Logo";
 import { useSession } from "@/src/lib/session";
 import { buscarFeed, contarNoRaio, type VagaDoFeed } from "@/src/api/feed";
 import { buscarPerfil, listarCategorias, type Category } from "@/src/api/profile";
@@ -98,6 +99,16 @@ export function FeedProfissional() {
 
   return (
     <SafeAreaView style={styles.root} edges={["top"]}>
+      {/* Esta tela monta o próprio SafeAreaView em vez de usar `Screen`
+          (o feed rola com RefreshControl), então a fileira do topo entra
+          aqui na mão, no mesmo lugar em que o `Screen` a desenha. O sininho
+          mora aqui, e não junto do título: ao lado do FILTROS ele espremia
+          a contagem de vagas a ponto de truncar ("4 oportunida..."). */}
+      <View style={styles.barraTopo}>
+        <Wordmark width={78} />
+        <NotificationBell />
+      </View>
+
       <View style={styles.cabecalho}>
         <View style={styles.tituloLinha}>
           <View style={{ flex: 1 }}>
@@ -119,8 +130,6 @@ export function FeedProfissional() {
               FILTROS{filtrosAtivos > 0 ? ` · ${filtrosAtivos}` : ""}
             </Text>
           </Pressable>
-
-          <NotificationBell />
         </View>
 
         {filtrosAbertos && (
@@ -234,6 +243,15 @@ export function FeedProfissional() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
+
+  barraTopo: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: space.xl,
+    paddingTop: space.md,
+    paddingBottom: space.sm
+  },
 
   cabecalho: {
     paddingHorizontal: space.xl,

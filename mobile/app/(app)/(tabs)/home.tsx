@@ -41,7 +41,7 @@ export default function Home() {
   );
 
   return (
-    <Screen right={<NotificationBell />}>
+    <Screen logo right={<NotificationBell />}>
       <View style={styles.header}>
         <Text style={styles.eyebrow}>
           {ehContratante ? "CONTRATANTE" : "PROFISSIONAL"}

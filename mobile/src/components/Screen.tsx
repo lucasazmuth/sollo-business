@@ -10,12 +10,19 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { Wordmark } from "@/src/components/Logo";
 import { colors, space, type } from "@/src/theme/tokens";
 
 type Props = {
   children: React.ReactNode;
   scroll?: boolean;
   back?: boolean;
+  /**
+   * Marca no canto esquerdo do topo. Usada nas telas raiz das abas, que não
+   * têm botão voltar — sem ela o app inteiro fica sem assinatura visual.
+   * Em tela empurrada o lugar é do botão voltar, então `back` tem prioridade.
+   */
+  logo?: boolean;
   /** Ação no canto direito da fileira do topo (ex.: sininho de notificações). */
   right?: React.ReactNode;
   contentStyle?: ViewStyle;
@@ -34,7 +41,14 @@ type Props = {
  * na status bar). O componente `SafeAreaView` resolve o inset nativamente
  * antes da primeira pintura, então esse frame incorreto nunca chega a existir.
  */
-export function Screen({ children, scroll = true, back = false, right, contentStyle }: Props) {
+export function Screen({
+  children,
+  scroll = true,
+  back = false,
+  logo = false,
+  right,
+  contentStyle
+}: Props) {
   const router = useRouter();
 
   const body = (
@@ -52,7 +66,7 @@ export function Screen({ children, scroll = true, back = false, right, contentSt
     <SafeAreaView style={styles.root} edges={["top", "bottom"]}>
       {/* No fluxo, não absoluto: como irmão do KeyboardAvoidingView (flex:1)
           o botão ficava coberto por ele e os toques não chegavam. */}
-      {(back || right) && (
+      {(back || logo || right) && (
         <View style={styles.barraVoltar}>
           {back ? (
             <Pressable
@@ -64,6 +78,10 @@ export function Screen({ children, scroll = true, back = false, right, contentSt
             >
               <Text style={styles.backIcon}>←</Text>
             </Pressable>
+          ) : logo ? (
+            <View style={styles.marca}>
+              <Wordmark width={78} />
+            </View>
           ) : (
             <View />
           )}
@@ -117,5 +135,8 @@ const styles = StyleSheet.create({
     // Fundo sólido: o conteúdo rola por baixo e o botão precisa continuar legível.
     backgroundColor: colors.bg
   },
-  backIcon: { ...type.h3, color: colors.white, marginTop: -2 }
+  backIcon: { ...type.h3, color: colors.white, marginTop: -2 },
+  // Mesma altura do botão voltar/sininho, para a fileira não pular de altura
+  // entre uma tela e outra.
+  marca: { height: 44, justifyContent: "center" }
 });

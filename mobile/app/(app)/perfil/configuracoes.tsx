@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Screen } from "@/src/components/Screen";
 import { excluirConta } from "@/src/lib/auth";
 import { useSession } from "@/src/lib/session";
+import { LINKS } from "@/src/lib/links";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 export default function Configuracoes() {
@@ -23,6 +24,17 @@ export default function Configuracoes() {
         { text: "Excluir conta", style: "destructive", onPress: excluir }
       ]
     );
+  }
+
+  // `openURL` rejeita quando não há app capaz de abrir o esquema (aparelho
+  // sem cliente de e-mail configurado, por exemplo). Sem o catch, o toque
+  // derrubava a tela com unhandled rejection em vez de não fazer nada.
+  async function abrir(url: string) {
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert("Não deu para abrir", url);
+    }
   }
 
   async function excluir() {
@@ -45,7 +57,7 @@ export default function Configuracoes() {
         <Text style={styles.titulo}>Conta</Text>
       </View>
 
-      <View style={styles.lista}>
+      <View style={[styles.lista, styles.primeiraLista]}>
         <Pressable
           style={styles.item}
           onPress={async () => {
@@ -64,6 +76,29 @@ export default function Configuracoes() {
           onPress={() => router.push("/(app)/notificacoes/preferencias")}
         >
           <Text style={styles.itemTexto}>Preferências de notificação</Text>
+        </Pressable>
+      </View>
+
+      <Text style={styles.grupoTitulo}>AJUDA</Text>
+
+      <View style={styles.lista}>
+        <Pressable style={styles.item} onPress={() => abrir(LINKS.suporteMailto)}>
+          <Text style={styles.itemTexto}>Suporte</Text>
+          <Text style={styles.itemDetalhe}>{LINKS.suporteEmail}</Text>
+        </Pressable>
+      </View>
+
+      <Text style={styles.grupoTitulo}>LEGAL</Text>
+
+      <View style={styles.lista}>
+        <Pressable style={styles.item} onPress={() => abrir(LINKS.termos)}>
+          <Text style={styles.itemTexto}>Termos de uso</Text>
+          <Text style={styles.itemDetalhe}>Abre no navegador</Text>
+        </Pressable>
+
+        <Pressable style={styles.item} onPress={() => abrir(LINKS.privacidade)}>
+          <Text style={styles.itemTexto}>Política de privacidade</Text>
+          <Text style={styles.itemDetalhe}>Abre no navegador</Text>
         </Pressable>
       </View>
 
@@ -95,8 +130,11 @@ const styles = StyleSheet.create({
   dot: { color: colors.magenta },
   titulo: { ...type.h1, color: colors.white },
 
-  lista: { marginTop: space.xl, gap: space.sm },
+  grupoTitulo: { ...type.label, color: colors.inkFaint, marginTop: space.xl },
+  lista: { marginTop: space.md, gap: space.sm },
+  primeiraLista: { marginTop: space.xl },
   item: {
+    gap: 2,
     paddingVertical: space.lg,
     paddingHorizontal: space.lg,
     borderRadius: radius.lg,
@@ -105,6 +143,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface
   },
   itemTexto: { ...type.bodyMedium, color: colors.white },
+  itemDetalhe: { ...type.caption, color: colors.inkFaint },
 
   zonaPerigo: {
     marginTop: space["2xl"],

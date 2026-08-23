@@ -774,6 +774,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      abrir_conversa: {
+        Args: { p_job_id: string; p_professional_id: string }
+        Returns: string
+      }
       admin_set_job_location: {
         Args: {
           p_cidade?: string

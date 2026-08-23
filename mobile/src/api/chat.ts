@@ -13,6 +13,26 @@ export type ConversaDaLista = Conversa & {
   ultima: string | null;
 };
 
+/**
+ * Abre (ou reaproveita) a conversa com um candidato.
+ *
+ * Só o contratante dono da vaga consegue: `conversations` não tem policy de
+ * INSERT, e a checagem vive dentro da função no banco. Antes o chat nascia
+ * de um trigger em toda candidatura, o que enchia a caixa dos dois lados de
+ * canal vazio que ninguém abriu.
+ */
+export async function abrirConversa(jobId: string, professionalId: string): Promise<string> {
+  return comRetry(async () => {
+    const { data, error } = await supabase.rpc("abrir_conversa", {
+      p_job_id: jobId,
+      p_professional_id: professionalId
+    });
+    if (error) throw new Error(error.message);
+    if (!data) throw new Error("Não foi possível abrir a conversa.");
+    return data as string;
+  });
+}
+
 export async function listarConversas(meuId: string): Promise<ConversaDaLista[]> {
   const { data, error } = await supabase
     .from("conversations")

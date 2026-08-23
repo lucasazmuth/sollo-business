@@ -6,7 +6,7 @@ import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { useSession } from "@/src/lib/session";
 import { salvarDadosPessoais } from "@/src/api/profile";
-import { cpfValido, formatarCpf, apenasDigitos } from "@/src/lib/cpf";
+import { cpfValido, formatarCpf, formatarCep, apenasDigitos } from "@/src/lib/cpf";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 type Endereco = {
@@ -56,7 +56,7 @@ export default function CompletarCadastro() {
     try {
       const res = await fetch(`https://viacep.com.br/ws/${digitos}/json/`);
       const json = await res.json();
-      if (json.erro) {
+      if (json.erro || !json.cep) {
         setErros((e) => ({ ...e, cep: "CEP não encontrado." }));
         return;
       }
@@ -166,11 +166,11 @@ export default function CompletarCadastro() {
             <Input
               label="CEP"
               value={end.cep}
-              onChangeText={(t) => setEnd((v) => ({ ...v, cep: t }))}
+              onChangeText={(t) => setEnd((v) => ({ ...v, cep: formatarCep(t) }))}
               placeholder="00000-000"
               keyboardType="number-pad"
               maxLength={9}
-              style={{ flex: 1 }}
+              containerStyle={styles.cepCampo}
             />
             <Pressable onPress={buscarCep} hitSlop={10} style={styles.buscarBotao}>
               {buscandoCep ? (
@@ -195,7 +195,7 @@ export default function CompletarCadastro() {
               value={end.numero}
               onChangeText={(t) => setEnd((v) => ({ ...v, numero: t }))}
               keyboardType="number-pad"
-              style={{ flex: 1 }}
+              containerStyle={styles.colunaMenor}
               error={erros.numero}
             />
             <Input
@@ -203,7 +203,7 @@ export default function CompletarCadastro() {
               value={end.complemento}
               onChangeText={(t) => setEnd((v) => ({ ...v, complemento: t }))}
               placeholder="Opcional"
-              style={{ flex: 1 }}
+              containerStyle={styles.colunaMaior}
             />
           </View>
 
@@ -219,7 +219,7 @@ export default function CompletarCadastro() {
               label="Cidade"
               value={end.cidade}
               onChangeText={(t) => setEnd((v) => ({ ...v, cidade: t }))}
-              style={{ flex: 2 }}
+              containerStyle={styles.colunaMaior}
               error={erros.cidade}
             />
             <Input
@@ -228,7 +228,7 @@ export default function CompletarCadastro() {
               onChangeText={(t) => setEnd((v) => ({ ...v, uf: t.toUpperCase().slice(0, 2) }))}
               maxLength={2}
               autoCapitalize="characters"
-              style={{ flex: 1 }}
+              containerStyle={styles.colunaUf}
             />
           </View>
         </View>
@@ -255,10 +255,16 @@ const styles = StyleSheet.create({
 
   cepLinha: { flexDirection: "row", alignItems: "flex-end", gap: space.md },
   cepLinhaErro: {},
+  // O CEP tem tamanho fixo (8 dígitos): largura fixa deixa o campo com folga
+  // real para digitar e sobra espaço para o "BUSCAR" ao lado.
+  cepCampo: { width: 170 },
   buscarBotao: { height: 56, justifyContent: "center", paddingHorizontal: space.sm },
   buscarTexto: { ...type.label, color: colors.magenta },
 
   duasColunas: { flexDirection: "row", gap: space.md },
+  colunaMaior: { flex: 2 },
+  colunaMenor: { flex: 1 },
+  colunaUf: { width: 76 },
 
   rodape: { marginTop: space["2xl"], paddingBottom: space.lg }
 });

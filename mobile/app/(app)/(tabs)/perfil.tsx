@@ -7,6 +7,8 @@ import { Screen } from "@/src/components/Screen";
 import { Avatar } from "@/src/components/Avatar";
 import { Chip } from "@/src/components/Chip";
 import { NotificationBell } from "@/src/components/NotificationBell";
+import { SettingsButton } from "@/src/components/SettingsButton";
+import { HeaderAcoes } from "@/src/components/HeaderAcoes";
 import { useSession } from "@/src/lib/session";
 import { buscarPerfil, listarCategorias, type PerfilCompleto, type Category } from "@/src/api/profile";
 import { colors, radius, space, type } from "@/src/theme/tokens";
@@ -91,7 +93,15 @@ export default function MeuPerfil() {
   const celula = (larguraUtil - gap * 2) / 3;
 
   return (
-    <Screen right={<NotificationBell />}>
+    <Screen
+      logo
+      right={
+        <HeaderAcoes>
+          <SettingsButton />
+          <NotificationBell />
+        </HeaderAcoes>
+      }
+    >
       <Animated.View entering={FadeIn.duration(400)} style={styles.topo}>
         <Avatar
           url={profile.avatar_url}
@@ -167,12 +177,6 @@ export default function MeuPerfil() {
             <Text style={styles.botaoSecundarioTexto}>ONDE EU ATUO</Text>
           </Pressable>
         )}
-        <Pressable
-          style={styles.botaoSecundario}
-          onPress={() => router.push("/(app)/perfil/configuracoes")}
-        >
-          <Text style={styles.botaoSecundarioTexto}>CONFIGURAÇÕES</Text>
-        </Pressable>
       </View>
 
       {ehProfissional && (
@@ -270,7 +274,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
-  botaoSecundarioTexto: { ...type.button, fontSize: 11, color: colors.white },
+  botaoSecundarioTexto: { ...type.button, fontSize: 12, color: colors.white },
 
   secaoPortfolio: { marginTop: space["2xl"], gap: space.lg, paddingBottom: space.xl },
   secaoTitulo: { ...type.h3, color: colors.white },

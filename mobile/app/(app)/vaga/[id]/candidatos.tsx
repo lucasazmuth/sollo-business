@@ -12,6 +12,7 @@ import {
   type Candidato
 } from "@/src/api/applications";
 import { buscarVaga, type VagaDetalhe } from "@/src/api/jobs";
+import { abrirConversa } from "@/src/api/chat";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 export default function Candidatos() {
@@ -70,6 +71,21 @@ export default function Candidatos() {
         }
       ]
     );
+  }
+
+  // A conversa nasce daqui, de um toque do contratante — não mais de um
+  // trigger em toda candidatura, que abria dezenas de canais vazios.
+  async function conversar(c: Candidato) {
+    if (!id) return;
+    setAgindo(c.id);
+    try {
+      const conversaId = await abrirConversa(id, c.professional_id);
+      router.push(`/(app)/conversa/${conversaId}`);
+    } catch (e) {
+      Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao abrir a conversa.");
+    } finally {
+      setAgindo(null);
+    }
   }
 
   async function recusar(c: Candidato) {
@@ -166,27 +182,41 @@ export default function Candidatos() {
                     </View>
                   ) : recusado ? (
                     <Text style={styles.faixaRecusado}>Não selecionado</Text>
-                  ) : vagaFechada ? null : (
+                  ) : null}
+
+                  {!recusado && (
                     <View style={styles.acoes}>
-                      <Pressable
-                        style={[styles.botao, styles.botaoRecusar]}
-                        onPress={() => recusar(c)}
-                        disabled={ocupado}
-                      >
-                        <Text style={styles.botaoRecusarTexto}>RECUSAR</Text>
-                      </Pressable>
+                      {!selecionado && !vagaFechada && (
+                        <Pressable
+                          style={[styles.botao, styles.botaoRecusar]}
+                          onPress={() => recusar(c)}
+                          disabled={ocupado}
+                        >
+                          <Text style={styles.botaoRecusarTexto}>RECUSAR</Text>
+                        </Pressable>
+                      )}
 
                       <Pressable
-                        style={[styles.botao, styles.botaoEscolher]}
-                        onPress={() => confirmarSelecao(c)}
+                        style={[styles.botao, styles.botaoConversar]}
+                        onPress={() => conversar(c)}
                         disabled={ocupado}
                       >
-                        {ocupado ? (
-                          <ActivityIndicator color={colors.white} size="small" />
-                        ) : (
-                          <Text style={styles.botaoEscolherTexto}>ESCOLHER</Text>
-                        )}
+                        <Text style={styles.botaoConversarTexto}>CONVERSAR</Text>
                       </Pressable>
+
+                      {!selecionado && !vagaFechada && (
+                        <Pressable
+                          style={[styles.botao, styles.botaoEscolher]}
+                          onPress={() => confirmarSelecao(c)}
+                          disabled={ocupado}
+                        >
+                          {ocupado ? (
+                            <ActivityIndicator color={colors.white} size="small" />
+                          ) : (
+                            <Text style={styles.botaoEscolherTexto}>ESCOLHER</Text>
+                          )}
+                        </Pressable>
+                      )}
                     </View>
                   )}
                 </View>
@@ -238,6 +268,8 @@ const styles = StyleSheet.create({
   },
   botaoRecusar: { borderWidth: 1, borderColor: colors.line },
   botaoRecusarTexto: { ...type.button, fontSize: 11, color: colors.inkDim },
+  botaoConversar: { borderWidth: 1, borderColor: colors.lineStrong },
+  botaoConversarTexto: { ...type.button, fontSize: 11, color: colors.white },
   botaoEscolher: { backgroundColor: colors.magenta },
   botaoEscolherTexto: { ...type.button, fontSize: 11, color: colors.white },
 

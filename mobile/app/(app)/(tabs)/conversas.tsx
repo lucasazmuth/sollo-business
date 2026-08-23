@@ -20,7 +20,8 @@ function quando(iso: string | null) {
 
 export default function Conversas() {
   const router = useRouter();
-  const { session } = useSession();
+  const { session, profile } = useSession();
+  const ehContratante = profile?.tipo === "contratante";
   const [itens, setItens] = useState<ConversaDaLista[]>([]);
   const [carregando, setCarregando] = useState(true);
 
@@ -44,7 +45,7 @@ export default function Conversas() {
   const naoLidas = itens.reduce((t, c) => t + c.naoLidas, 0);
 
   return (
-    <Screen right={<NotificationBell />}>
+    <Screen logo right={<NotificationBell />}>
       <View style={styles.cabecalho}>
         <Text style={styles.eyebrow}>
           <Text style={styles.dot}>● </Text>CONVERSAS
@@ -62,8 +63,9 @@ export default function Conversas() {
         <View style={styles.vazio}>
           <Text style={styles.vazioTitulo}>Nenhuma conversa ainda</Text>
           <Text style={styles.vazioTexto}>
-            A conversa nasce junto com a candidatura. Quando alguém se candidatar, o canal já
-            estará aberto aqui.
+            {ehContratante
+              ? "Abra a lista de candidatos de uma vaga e toque em Conversar para falar com quem te interessou."
+              : "Quando um contratante quiser falar sobre a sua candidatura, a conversa aparece aqui."}
           </Text>
         </View>
       ) : (

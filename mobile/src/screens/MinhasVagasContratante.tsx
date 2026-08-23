@@ -42,7 +42,7 @@ export function MinhasVagasContratante() {
   );
 
   return (
-    <Screen right={<NotificationBell />}>
+    <Screen logo right={<NotificationBell />}>
       <View style={styles.cabecalho}>
         <Text style={styles.titulo}>Minhas vagas</Text>
         <Text style={styles.lead}>

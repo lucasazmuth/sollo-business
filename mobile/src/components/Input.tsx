@@ -5,7 +5,9 @@ import {
   Text,
   TextInput,
   View,
-  type TextInputProps
+  type TextInputProps,
+  type StyleProp,
+  type ViewStyle
 } from "react-native";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
@@ -14,17 +16,26 @@ type Props = TextInputProps & {
   error?: string;
   /** Adiciona o botão mostrar/ocultar. */
   secure?: boolean;
+  /**
+   * Estilo do bloco inteiro (rótulo + caixa + erro).
+   *
+   * `style` vai para o `TextInput` lá dentro, então `style={{ flex: 1 }}`
+   * num campo em linha não estica coisa nenhuma: quem divide o espaço com
+   * o irmão é este contêiner. Era o que deixava CEP, número e UF do
+   * cadastro reduzidos a uma caixinha ilegível.
+   */
+  containerStyle?: StyleProp<ViewStyle>;
 };
 
 export const Input = forwardRef<TextInput, Props>(function Input(
-  { label, error, secure, style, ...rest },
+  { label, error, secure, style, containerStyle, ...rest },
   ref
 ) {
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(true);
 
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, containerStyle]}>
       <Text style={styles.label}>{label.toUpperCase()}</Text>
 
       <View
