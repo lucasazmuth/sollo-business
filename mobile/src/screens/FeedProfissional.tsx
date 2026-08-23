@@ -6,16 +6,15 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
-  useWindowDimensions
+  View
 } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
-import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/src/components/Button";
-import { Chip } from "@/src/components/Chip";
 import { VagaCard } from "@/src/components/VagaCard";
 import { NotificationBell } from "@/src/components/NotificationBell";
+import { FiltrosVagasModal } from "@/src/components/FiltrosVagasModal";
 import { Wordmark } from "@/src/components/Logo";
 import { useSession } from "@/src/lib/session";
 import { buscarFeed, contarNoRaio, type VagaDoFeed } from "@/src/api/feed";
@@ -23,12 +22,9 @@ import { buscarPerfil, listarCategorias, type Category } from "@/src/api/profile
 import { idsDasVagasQueAplicei } from "@/src/api/applications";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
-const RAIOS = [10, 20, 30, 50, 100];
-
 export function FeedProfissional() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { height: alturaTela } = useWindowDimensions();
   const { session, profile } = useSession();
   const userId = session?.user.id;
 
@@ -125,7 +121,7 @@ export function FeedProfissional() {
           </View>
 
           <Pressable
-            onPress={() => setFiltrosAbertos((v) => !v)}
+            onPress={() => setFiltrosAbertos(true)}
             style={[styles.botaoFiltro, filtrosAtivos > 0 && styles.botaoFiltroAtivo]}
           >
             <Text style={[styles.botaoFiltroTexto, filtrosAtivos > 0 && { color: colors.white }]}>
@@ -133,67 +129,6 @@ export function FeedProfissional() {
             </Text>
           </Pressable>
         </View>
-
-        {/* O painel vive no cabeçalho fixo, acima da lista. Com duas dezenas
-            de categorias ele passava da altura da tela e não havia o que
-            rolar: os últimos chips (inclusive "Só urgentes") ficavam
-            inalcançáveis. Teto de altura + rolagem própria resolve sem
-            empurrar o feed para fora de vista. */}
-        {filtrosAbertos && (
-          <Animated.View
-            entering={FadeIn.duration(220)}
-            style={[styles.filtros, { maxHeight: alturaTela * 0.42 }]}
-          >
-            <ScrollView
-              contentContainerStyle={styles.filtrosConteudo}
-              nestedScrollEnabled
-              keyboardShouldPersistTaps="handled"
-            >
-            <Text style={styles.filtroRotulo}>RAIO</Text>
-            <View style={styles.filtroLinha}>
-              <Chip
-                label="Meu raio"
-                selecionado={raio === null}
-                onPress={() => setRaio(null)}
-              />
-              {RAIOS.map((r) => (
-                <Chip
-                  key={r}
-                  label={`${r} km`}
-                  selecionado={raio === r}
-                  onPress={() => setRaio(r)}
-                />
-              ))}
-            </View>
-
-            <Text style={styles.filtroRotulo}>CATEGORIA</Text>
-            <View style={styles.filtroLinha}>
-              <Chip
-                label="Minhas"
-                selecionado={categoriaFiltro === null}
-                onPress={() => setCategoriaFiltro(null)}
-              />
-              {categorias.map((c) => (
-                <Chip
-                  key={c.id}
-                  label={c.nome}
-                  selecionado={categoriaFiltro === c.id}
-                  onPress={() => setCategoriaFiltro(categoriaFiltro === c.id ? null : c.id)}
-                />
-              ))}
-            </View>
-
-            <View style={styles.filtroLinha}>
-              <Chip
-                label="Só urgentes"
-                tom="lime"
-                selecionado={apenasUrgentes}
-                onPress={() => setApenasUrgentes((v) => !v)}
-              />
-            </View>
-            </ScrollView>
-          </Animated.View>
-        )}
       </View>
 
       <ScrollView
@@ -253,6 +188,19 @@ export function FeedProfissional() {
           ))
         )}
       </ScrollView>
+
+      <FiltrosVagasModal
+        visivel={filtrosAbertos}
+        onFechar={() => setFiltrosAbertos(false)}
+        categorias={categorias}
+        raio={raio}
+        aoMudarRaio={setRaio}
+        categoriaFiltro={categoriaFiltro}
+        aoMudarCategoria={setCategoriaFiltro}
+        apenasUrgentes={apenasUrgentes}
+        aoMudarUrgentes={setApenasUrgentes}
+        totalVagas={vagas.length}
+      />
     </SafeAreaView>
   );
 }
@@ -290,10 +238,6 @@ const styles = StyleSheet.create({
   botaoFiltroAtivo: { borderColor: colors.magenta, backgroundColor: "rgba(216,19,104,0.12)" },
   botaoFiltroTexto: { ...type.label, fontSize: 10, color: colors.inkDim },
 
-  filtros: { marginTop: space.lg },
-  filtrosConteudo: { gap: space.sm, paddingBottom: space.sm },
-  filtroRotulo: { ...type.label, fontSize: 9, color: colors.inkFaint, marginTop: space.sm },
-  filtroLinha: { flexDirection: "row", flexWrap: "wrap", gap: space.sm },
 
   lista: { padding: space.xl, gap: space.md },
   centro: { paddingVertical: space["3xl"], alignItems: "center" },
