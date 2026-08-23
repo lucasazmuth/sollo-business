@@ -83,6 +83,10 @@ export default function MeuPerfil() {
   const { profile, professional, hirer, portfolio } = perfil;
   const ehProfissional = profile.tipo === "profissional";
 
+  // A edição do portfólio vive na tela de editar perfil; daqui só levamos
+  // a pessoa até lá.
+  const irParaPortfolio = () => router.push("/(app)/perfil/editar?secao=portfolio");
+
   const nomesCategorias = categorias
     .filter((c) => professional?.categorias?.includes(c.id))
     .map((c) => c.nome);
@@ -183,12 +187,21 @@ export default function MeuPerfil() {
         <View style={styles.secaoPortfolio}>
           <Text style={styles.secaoTitulo}>Portfólio</Text>
 
+          {/* O card vazio era só texto e um toque sem pista nenhuma: para
+              subir trabalho a pessoa tinha que adivinhar que o caminho era
+              "Editar perfil". O (+) e o botão dizem para onde ir. */}
           {portfolio.length === 0 ? (
-            <Pressable style={styles.vazio} onPress={() => router.push("/(app)/perfil/editar")}>
+            <Pressable style={styles.vazio} onPress={irParaPortfolio}>
+              <View style={styles.vazioMais}>
+                <Text style={styles.vazioMaisSinal}>+</Text>
+              </View>
               <Text style={styles.vazioTitulo}>Seu portfólio está vazio</Text>
               <Text style={styles.vazioTexto}>
                 É por aqui que o contratante decide. Suba pelo menos três trabalhos.
               </Text>
+              <View style={styles.vazioBotao}>
+                <Text style={styles.vazioBotaoTexto}>ADICIONAR TRABALHOS</Text>
+              </View>
             </Pressable>
           ) : (
             <View style={[styles.grade, { gap }]}>
@@ -206,6 +219,17 @@ export default function MeuPerfil() {
                   </Animated.View>
                 );
               })}
+
+              {/* Mesmo com portfólio cheio faltava por onde acrescentar sem
+                  passar por "Editar perfil". */}
+              <Pressable
+                style={[styles.adicionar, { width: celula, height: celula }]}
+                onPress={irParaPortfolio}
+                accessibilityRole="button"
+                accessibilityLabel="Adicionar trabalho ao portfólio"
+              >
+                <Text style={styles.adicionarSinal}>+</Text>
+              </Pressable>
             </View>
           )}
         </View>
@@ -288,6 +312,38 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderColor: colors.lineStrong
   },
+  vazioMais: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: colors.magenta,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: space.xs
+  },
+  vazioMaisSinal: { ...type.h2, color: colors.magenta, marginTop: -3 },
   vazioTitulo: { ...type.h3, color: colors.white },
-  vazioTexto: { ...type.body, color: colors.inkDim }
+  vazioTexto: { ...type.body, color: colors.inkDim },
+  vazioBotao: {
+    alignSelf: "flex-start",
+    marginTop: space.md,
+    height: 44,
+    paddingHorizontal: space.lg,
+    borderRadius: radius.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.magenta
+  },
+  vazioBotaoTexto: { ...type.button, fontSize: 11, color: colors.white },
+
+  adicionar: {
+    borderRadius: 4,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: colors.lineStrong,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  adicionarSinal: { ...type.h2, color: colors.inkDim }
 });

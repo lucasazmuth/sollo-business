@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -10,7 +10,7 @@ import {
   useWindowDimensions
 } from "react-native";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
@@ -36,6 +36,12 @@ export default function EditarPerfil() {
   const { session, profile: perfilSessao, refreshProfile } = useSession();
   const { width } = useWindowDimensions();
   const userId = session?.user.id;
+
+  // Vindo do atalho "Adicionar trabalhos" do perfil, o seletor abre sozinho:
+  // esta tela é um formulário longo e o portfólio fica lá no fim, então cair
+  // no topo dela deixava a pessoa exatamente onde ela já estava perdida.
+  const { secao } = useLocalSearchParams<{ secao?: string }>();
+  const jaAbriuSeletor = useRef(false);
 
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
@@ -117,6 +123,12 @@ export default function EditarPerfil() {
       setEnviandoItem(false);
     }
   }, [userId, portfolio.length]);
+
+  useEffect(() => {
+    if (secao !== "portfolio" || carregando || jaAbriuSeletor.current) return;
+    jaAbriuSeletor.current = true;
+    adicionarItem();
+  }, [secao, carregando, adicionarItem]);
 
   const removerItem = useCallback((item: PortfolioItem) => {
     Alert.alert("Remover do portfólio?", "A imagem sai do seu perfil.", [
