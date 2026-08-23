@@ -5,7 +5,7 @@
 
 export const site = {
   name: "Sollo Business",
-  email: "contato@sollo.app",
+  email: "contato@sollo.business",
   title: "Sollo Business — O marketplace pensado para o mercado do entretenimento",
   description:
     "Encontre os melhores talentos do mercado, colabore em projetos e tire suas ideias do papel. Conecte-se, negocie e entregue com facilidade e segurança."
@@ -254,7 +254,7 @@ export const footerGroups = [
     title: "Suporte",
     links: [
       { label: "FAQ", href: "#faq" },
-      { label: "contato@sollo.app", href: "mailto:contato@sollo.app" }
+      { label: "contato@sollo.business", href: "mailto:contato@sollo.business" }
     ]
   },
   {

@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      origem: "sollo.app — formulário de parcerias",
+      origem: "sollo.business — formulário de parcerias",
       nome,
       email,
       projeto,

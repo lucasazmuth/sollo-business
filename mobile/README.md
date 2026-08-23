@@ -369,9 +369,9 @@ e o usuário em `auth.users` passa a devolver 404.
 ## Termos de uso e política de privacidade
 
 Publicados como páginas estáticas da landing (`app/termos/page.tsx`, `app/privacidade/page.tsx`,
-raiz do repo) — `sollo.app/termos` e `sollo.app/privacidade`. Os links em `(auth)/welcome.tsx` e
-`(auth)/cadastro.tsx`, que antes apontavam para a própria tela, agora abrem essas URLs via
-`Linking.openURL`.
+raiz do repo) — `www.sollo.business/termos` e `www.sollo.business/privacidade`. Os links em
+`(auth)/welcome.tsx` e `(auth)/cadastro.tsx`, que antes apontavam para a própria tela, agora
+abrem essas URLs via `Linking.openURL`.
 
 ## Landing: copy sem promessa de pagamento
 
@@ -407,5 +407,5 @@ da conta tem:
 2. **Login social** (Google/Apple) — não implementado; Apple Sign In é exigido pela App Store
    se houver login social de terceiros.
 3. **Verificação de e-mail** e política de senha definitiva a combinar com o backend.
-4. **Domínio `sollo.app`** — os links de termos/privacidade assumem esse domínio; ajustar se o
-   domínio de produção for outro antes de builds de loja.
+4. **Domínio `www.sollo.business`** — os links de termos/privacidade assumem esse domínio; ajustar
+   se o domínio de produção mudar antes de builds de loja.

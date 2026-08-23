@@ -39,13 +39,13 @@ export default function Welcome() {
 
         <Text style={styles.terms}>
           Ao continuar, você concorda com os{" "}
-          <Text style={styles.link} onPress={() => Linking.openURL("https://sollo.app/termos")}>
+          <Text style={styles.link} onPress={() => Linking.openURL("https://www.sollo.business/termos")}>
             Termos de uso
           </Text>{" "}
           e a{" "}
           <Text
             style={styles.link}
-            onPress={() => Linking.openURL("https://sollo.app/privacidade")}
+            onPress={() => Linking.openURL("https://www.sollo.business/privacidade")}
           >
             Política de privacidade
           </Text>

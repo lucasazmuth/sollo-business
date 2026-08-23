@@ -117,14 +117,14 @@ export default function Cadastro() {
             Li e aceito os{" "}
             <Text
               style={styles.link}
-              onPress={() => Linking.openURL("https://sollo.app/termos")}
+              onPress={() => Linking.openURL("https://www.sollo.business/termos")}
             >
               Termos de uso
             </Text>{" "}
             e a{" "}
             <Text
               style={styles.link}
-              onPress={() => Linking.openURL("https://sollo.app/privacidade")}
+              onPress={() => Linking.openURL("https://www.sollo.business/privacidade")}
             >
               Política de privacidade
             </Text>
