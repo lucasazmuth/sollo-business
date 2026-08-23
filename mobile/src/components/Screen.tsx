@@ -25,6 +25,12 @@ type Props = {
   logo?: boolean;
   /** Ação no canto direito da fileira do topo (ex.: sininho de notificações). */
   right?: React.ReactNode;
+  /**
+   * Camada decorativa atrás de tudo, sangrando por baixo da safe area
+   * (ex.: as esferas em gradiente da marca). Fica fora do `SafeAreaView`
+   * de propósito: contida nele, pararia numa faixa preta no topo.
+   */
+  fundo?: React.ReactNode;
   contentStyle?: ViewStyle;
 };
 
@@ -47,6 +53,7 @@ export function Screen({
   back = false,
   logo = false,
   right,
+  fundo,
   contentStyle
 }: Props) {
   const router = useRouter();
@@ -62,8 +69,11 @@ export function Screen({
     </View>
   );
 
-  return (
-    <SafeAreaView style={styles.root} edges={["top", "bottom"]}>
+  const conteudo = (
+    <SafeAreaView
+      style={[styles.root, !!fundo && styles.rootTransparente]}
+      edges={["top", "bottom"]}
+    >
       {/* No fluxo, não absoluto: como irmão do KeyboardAvoidingView (flex:1)
           o botão ficava coberto por ele e os toques não chegavam. */}
       {(back || logo || right) && (
@@ -107,10 +117,20 @@ export function Screen({
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
+
+  if (!fundo) return conteudo;
+
+  return (
+    <View style={styles.root}>
+      {fundo}
+      {conteudo}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
+  rootTransparente: { backgroundColor: "transparent" },
   flex: { flex: 1 },
   scroll: { flexGrow: 1 },
   body: { flex: 1, paddingHorizontal: space.xl, paddingBottom: space.xl },

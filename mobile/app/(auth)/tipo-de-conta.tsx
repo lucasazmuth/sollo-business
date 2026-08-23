@@ -7,25 +7,38 @@ import { Button } from "@/src/components/Button";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 import type { AccountType } from "@/src/lib/auth";
 
+/**
+ * Sem selo de preço: nada de cobrança está integrado ainda, e anunciar
+ * valor numa tela de cadastro é promessa que o produto não cumpre hoje.
+ * O que fica é o que cada conta faz.
+ */
 const options: {
   id: AccountType;
   title: string;
   text: string;
-  badge: string;
+  itens: string[];
   accent: string;
 }[] = [
   {
     id: "profissional",
     title: "Sou profissional",
-    text: "Exponha seu trabalho, candidate-se a vagas e receba pelos serviços entregues.",
-    badge: "R$ 0 · sem comissão",
+    text: "Exponha seu trabalho e apareça para quem está contratando na sua região.",
+    itens: [
+      "Aviso na hora de vaga perto de você",
+      "Candidatura de um toque, sem formulário",
+      "Portfólio e reputação no seu perfil"
+    ],
     accent: colors.magenta
   },
   {
     id: "contratante",
     title: "Sou contratante",
-    text: "Publique vagas, encontre talentos e combine os detalhes direto pelo chat.",
-    badge: "R$ 0 · destaque opcional por R$ 7,90",
+    text: "Publique a vaga e fale direto com quem pode assumir hoje.",
+    itens: [
+      "Notificamos os profissionais no seu raio",
+      "Candidatos com portfólio e avaliações",
+      "Combine os detalhes pelo chat"
+    ],
     accent: colors.lime
   }
 ];
@@ -65,10 +78,13 @@ export default function TipoDeConta() {
 
                 <Text style={styles.cardText}>{option.text}</Text>
 
-                <View style={[styles.badge, on && { borderColor: option.accent }]}>
-                  <Text style={[styles.badgeText, on && { color: option.accent }]}>
-                    {option.badge}
-                  </Text>
+                <View style={styles.itens}>
+                  {option.itens.map((item) => (
+                    <View key={item} style={styles.item}>
+                      <View style={[styles.itemPonto, on && { backgroundColor: option.accent }]} />
+                      <Text style={styles.itemTexto}>{item}</Text>
+                    </View>
+                  ))}
                 </View>
               </Pressable>
             </Animated.View>
@@ -115,13 +131,8 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   radioDot: { width: 12, height: 12, borderRadius: 6 },
-  badge: {
-    alignSelf: "flex-start",
-    paddingVertical: space.sm,
-    paddingHorizontal: space.lg,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.line
-  },
-  badgeText: { ...type.label, color: colors.inkDim, letterSpacing: 1 }
+  itens: { gap: space.sm, marginTop: space.xs },
+  item: { flexDirection: "row", alignItems: "center", gap: space.md },
+  itemPonto: { width: 5, height: 5, borderRadius: 3, backgroundColor: colors.lineStrong },
+  itemTexto: { ...type.caption, color: colors.inkDim, flex: 1 }
 });
