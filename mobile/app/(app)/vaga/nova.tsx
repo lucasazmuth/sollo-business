@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -13,7 +13,7 @@ import { DestacarVagaModal } from "@/src/components/DestacarVagaModal";
 import { useSession } from "@/src/lib/session";
 import { escolherImagem, enviarImagem, MediaError } from "@/src/lib/media";
 import { listarCategorias, cadastroCompletoParaPublicar, type Category } from "@/src/api/profile";
-import { alcanceDaVaga, criarVaga } from "@/src/api/jobs";
+import { criarVaga } from "@/src/api/jobs";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 /** Daqui a 2 dias às 9h — chute razoável que evita digitação. */
@@ -46,6 +46,9 @@ export default function NovaVaga() {
   const [erros, setErros] = useState<Record<string, string>>({});
   const [destacarAberto, setDestacarAberto] = useState(false);
   const [cadastroCompleto, setCadastroCompleto] = useState<boolean | null>(null);
+
+  /** Trava síncrona de publicação — ver comentário em `publicar()`. */
+  const publicando = useRef(false);
 
   const emailConfirmado = !!session?.user.email_confirmed_at;
 
@@ -106,6 +109,12 @@ export default function NovaVaga() {
   async function publicar() {
     if (!userId || !validar()) return;
 
+    // Trava SÍNCRONA contra toque duplo. `setSalvando(true)` só desabilita o
+    // botão no próximo render, e toques rápidos entram aqui antes disso —
+    // foi assim que 4 toques viraram 4 vagas publicadas.
+    if (publicando.current) return;
+    publicando.current = true;
+
     setSalvando(true);
     try {
       const vaga = await criarVaga(userId, {
@@ -129,19 +138,22 @@ export default function NovaVaga() {
         publicar: true
       });
 
-      const alcance = await alcanceDaVaga(vaga.id);
-
-      Alert.alert(
-        "Vaga publicada",
-        alcance > 0
-          ? `${alcance} profissional${alcance > 1 ? "is" : ""} da região ${alcance > 1 ? "serão avisados" : "será avisado"}.`
-          : "Ainda não há profissionais dessa categoria no raio. A vaga fica aberta e avisamos assim que alguém se cadastrar.",
-        [{ text: "Ver vaga", onPress: () => router.replace(`/(app)/vaga/${vaga.id}`) }]
-      );
+      // Sai do formulário assim que a vaga existe. Antes a navegação só
+      // acontecia no botão do Alert: se ele não aparecesse, a pessoa ficava
+      // presa no formulário achando que nada tinha acontecido — e tocava de
+      // novo. O detalhe da vaga já mostra o alcance ("N profissionais da
+      // região se encaixam nesta vaga"), então nada de informação se perde.
+      router.replace(`/(app)/vaga/${vaga.id}`);
     } catch (e) {
-      Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao publicar.");
-    } finally {
+      // Só destrava em caso de erro: no sucesso a tela já saiu de cena, e
+      // reabrir a trava aqui permitiria um toque atrasado publicar de novo.
+      publicando.current = false;
       setSalvando(false);
+      // Erro inline, não Alert: esta tela tem um <Modal> montado (o de
+      // destacar vaga) e no iOS isso impede o Alert de aparecer — foi por
+      // isso que publicar parecia não fazer nada. Erro invisível em tela de
+      // publicação faz a pessoa tocar de novo e duplicar a vaga.
+      setErros({ geral: e instanceof Error ? e.message : "Falha ao publicar." });
     }
   }
 
@@ -366,6 +378,7 @@ export default function NovaVaga() {
           loading={salvando}
           disabled={!podeEnviar}
         />
+        {!!erros.geral && <Text style={styles.erroPublicar}>{erros.geral}</Text>}
         {!podeEnviar && (
           <Text style={styles.rodapeAjuda}>
             Faltam título, descrição, categoria e endereço confirmado.
@@ -446,6 +459,7 @@ const styles = StyleSheet.create({
 
   rodape: { marginTop: space["2xl"], gap: space.sm, paddingBottom: space.lg },
   rodapeAjuda: { ...type.caption, color: colors.inkFaint, textAlign: "center" },
+  erroPublicar: { ...type.caption, color: colors.danger, textAlign: "center" },
 
   bloqueio: { flex: 1, justifyContent: "center", gap: space.md },
   bloqueioTitulo: { ...type.h2, color: colors.white },
