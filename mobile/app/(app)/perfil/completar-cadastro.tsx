@@ -5,7 +5,7 @@ import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { useSession } from "@/src/lib/session";
-import { salvarPerfil, salvarPerfilContratante } from "@/src/api/profile";
+import { salvarDadosPessoais } from "@/src/api/profile";
 import { cpfValido, formatarCpf, apenasDigitos } from "@/src/lib/cpf";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
@@ -94,8 +94,11 @@ export default function CompletarCadastro() {
     if (!userId || !validar()) return;
     setSalvando(true);
     try {
-      await salvarPerfil(userId, { telefone: apenasDigitos(telefone) });
-      await salvarPerfilContratante(userId, {
+      // Tudo aqui é dado pessoal e vai para `dados_pessoais` (RLS de dono).
+      // Não pode voltar para `profiles`/`hirer_profiles`: são vitrines com
+      // SELECT liberado, e foi exatamente assim que o CPF vazou antes.
+      await salvarDadosPessoais(userId, {
+        telefone: apenasDigitos(telefone),
         nome_completo: nomeCompleto.trim(),
         cpf: apenasDigitos(cpf),
         cep: apenasDigitos(end.cep),

@@ -50,7 +50,9 @@ export async function listarCategorias(): Promise<Category[]> {
 
 export async function salvarPerfil(
   profileId: string,
-  campos: Partial<Pick<Profile, "nome" | "bio" | "avatar_url" | "telefone" | "cidade" | "uf">>
+  // `telefone` saiu daqui: `profiles` é vitrine pública (RLS de SELECT
+  // liberada), então dado pessoal vive em `dados_pessoais`.
+  campos: Partial<Pick<Profile, "nome" | "bio" | "avatar_url" | "cidade" | "uf">>
 ) {
   await comRetry(async () => {
     const { error } = await supabase.from("profiles").update(campos).eq("id", profileId);
@@ -73,13 +75,32 @@ export async function salvarPerfilProfissional(
 
 export async function salvarPerfilContratante(
   profileId: string,
+  campos: Partial<Pick<HirerProfile, "empresa" | "sobre" | "site" | "logo_url">>
+) {
+  await comRetry(async () => {
+    const { error } = await supabase
+      .from("hirer_profiles")
+      .update(campos)
+      .eq("profile_id", profileId);
+    if (error) throw new Error(error.message);
+  });
+}
+
+export type DadosPessoais = Tables<"dados_pessoais">;
+
+/**
+ * Telefone, CPF, nome completo e endereço.
+ *
+ * Ficam em `dados_pessoais`, com RLS de dono, e **nunca** em `profiles` ou
+ * `hirer_profiles`: essas duas são vitrine (SELECT liberado pra qualquer
+ * usuário autenticado), então qualquer coluna pessoal ali vira vazamento.
+ */
+export async function salvarDadosPessoais(
+  profileId: string,
   campos: Partial<
     Pick<
-      HirerProfile,
-      | "empresa"
-      | "sobre"
-      | "site"
-      | "logo_url"
+      DadosPessoais,
+      | "telefone"
       | "nome_completo"
       | "cpf"
       | "cep"
@@ -93,12 +114,21 @@ export async function salvarPerfilContratante(
   >
 ) {
   await comRetry(async () => {
+    // upsert: a linha só nasce quando a pessoa preenche pela primeira vez.
     const { error } = await supabase
-      .from("hirer_profiles")
-      .update(campos)
-      .eq("profile_id", profileId);
+      .from("dados_pessoais")
+      .upsert({ profile_id: profileId, ...campos }, { onConflict: "profile_id" });
     if (error) throw new Error(error.message);
   });
+}
+
+export async function buscarDadosPessoais(profileId: string): Promise<DadosPessoais | null> {
+  const { data } = await supabase
+    .from("dados_pessoais")
+    .select("*")
+    .eq("profile_id", profileId)
+    .maybeSingle();
+  return data ?? null;
 }
 
 /** Publicar vaga exige e-mail verificado, nome completo, CPF, telefone e endereço. */

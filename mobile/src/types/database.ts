@@ -138,6 +138,62 @@ export type Database = {
           },
         ]
       }
+      dados_pessoais: {
+        Row: {
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          complemento: string | null
+          cpf: string | null
+          created_at: string
+          logradouro: string | null
+          nome_completo: string | null
+          numero: string | null
+          profile_id: string
+          telefone: string | null
+          uf: string | null
+          updated_at: string
+        }
+        Insert: {
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          cpf?: string | null
+          created_at?: string
+          logradouro?: string | null
+          nome_completo?: string | null
+          numero?: string | null
+          profile_id: string
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          cpf?: string | null
+          created_at?: string
+          logradouro?: string | null
+          nome_completo?: string | null
+          numero?: string | null
+          profile_id?: string
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dados_pessoais_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       device_tokens: {
         Row: {
           created_at: string
@@ -175,63 +231,36 @@ export type Database = {
       }
       hirer_profiles: {
         Row: {
-          bairro: string | null
-          cep: string | null
-          cidade: string | null
-          complemento: string | null
-          cpf: string | null
           created_at: string
           empresa: string | null
           logo_url: string | null
-          logradouro: string | null
-          nome_completo: string | null
-          numero: string | null
           profile_id: string
           rating_avg: number | null
           rating_count: number
           site: string | null
           sobre: string | null
-          uf: string | null
           updated_at: string
         }
         Insert: {
-          bairro?: string | null
-          cep?: string | null
-          cidade?: string | null
-          complemento?: string | null
-          cpf?: string | null
           created_at?: string
           empresa?: string | null
           logo_url?: string | null
-          logradouro?: string | null
-          nome_completo?: string | null
-          numero?: string | null
           profile_id: string
           rating_avg?: number | null
           rating_count?: number
           site?: string | null
           sobre?: string | null
-          uf?: string | null
           updated_at?: string
         }
         Update: {
-          bairro?: string | null
-          cep?: string | null
-          cidade?: string | null
-          complemento?: string | null
-          cpf?: string | null
           created_at?: string
           empresa?: string | null
           logo_url?: string | null
-          logradouro?: string | null
-          nome_completo?: string | null
-          numero?: string | null
           profile_id?: string
           rating_avg?: number | null
           rating_count?: number
           site?: string | null
           sobre?: string | null
-          uf?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -655,7 +684,6 @@ export type Database = {
           id: string
           last_seen_at: string | null
           nome: string
-          telefone: string | null
           tipo: Database["public"]["Enums"]["account_type"]
           uf: string | null
           updated_at: string
@@ -668,7 +696,6 @@ export type Database = {
           id: string
           last_seen_at?: string | null
           nome: string
-          telefone?: string | null
           tipo: Database["public"]["Enums"]["account_type"]
           uf?: string | null
           updated_at?: string
@@ -681,7 +708,6 @@ export type Database = {
           id?: string
           last_seen_at?: string | null
           nome?: string
-          telefone?: string | null
           tipo?: Database["public"]["Enums"]["account_type"]
           uf?: string | null
           updated_at?: string

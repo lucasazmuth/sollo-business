@@ -123,13 +123,26 @@ export default function MeuPerfil() {
         </View>
       )}
 
+      {/* Contratante também tem nota e histórico, mas em `hirer_profiles`.
+          Ler só de `professional` mostrava "-" e 0 para eles mesmo com
+          avaliações reais, e ainda exibia "no portfólio", que não existe
+          para esse tipo de conta. Mesma regra do perfil público. */}
       <View style={styles.metricas}>
         <Metric
-          valor={professional?.rating_avg ? Number(professional.rating_avg).toFixed(1) : "-"}
+          valor={
+            professional?.rating_avg
+              ? Number(professional.rating_avg).toFixed(1)
+              : hirer?.rating_avg
+                ? Number(hirer.rating_avg).toFixed(1)
+                : "-"
+          }
           rotulo="avaliação"
         />
-        <Metric valor={String(professional?.rating_count ?? 0)} rotulo="trabalhos" />
-        <Metric valor={String(portfolio.length)} rotulo="no portfólio" />
+        <Metric
+          valor={String(professional?.rating_count ?? hirer?.rating_count ?? 0)}
+          rotulo="trabalhos"
+        />
+        {ehProfissional && <Metric valor={String(portfolio.length)} rotulo="no portfólio" />}
       </View>
 
       {!!profile.bio && <Text style={styles.bio}>{profile.bio}</Text>}
