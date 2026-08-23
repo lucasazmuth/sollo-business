@@ -24,6 +24,17 @@ export default function Login() {
       await signIn(email, senha);
       router.replace("/home");
     } catch (e) {
+      // Conta existe mas o e-mail nunca foi confirmado: em vez de deixar a
+      // pessoa presa num erro sem saída, leva pra tela do código (que tem o
+      // botão de reenviar). Era a única forma de chegar lá depois do cadastro.
+      if (e instanceof AuthError && e.motivo === "email_nao_confirmado") {
+        router.push({
+          pathname: "/(auth)/confirmar-email",
+          params: { email: email.trim().toLowerCase() }
+        });
+        return;
+      }
+
       if (e instanceof AuthError && e.field) setErrors({ [e.field]: e.message });
       else setErrors({ geral: "Não foi possível entrar agora." });
     } finally {

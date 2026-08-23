@@ -16,12 +16,18 @@ export type User = {
   tipo: AccountType;
 };
 
+/** Causas que a UI precisa tratar de forma diferente de "mostrar o texto". */
+export type AuthErrorMotivo = "email_nao_confirmado";
+
 export class AuthError extends Error {
   field?: "nome" | "email" | "senha";
-  constructor(message: string, field?: AuthError["field"]) {
+  motivo?: AuthErrorMotivo;
+
+  constructor(message: string, field?: AuthError["field"], motivo?: AuthErrorMotivo) {
     super(message);
     this.name = "AuthError";
     this.field = field;
+    this.motivo = motivo;
   }
 }
 
@@ -42,7 +48,13 @@ function traduz(mensagem: string): AuthError {
     return new AuthError("E-mail ou senha incorretos.", "senha");
   }
   if (m.includes("email not confirmed")) {
-    return new AuthError("Confirme seu e-mail antes de entrar.", "email");
+    // A tela de login usa o motivo pra levar direto à confirmação por código,
+    // em vez de deixar a pessoa presa num erro sem saída.
+    return new AuthError(
+      "Confirme seu e-mail antes de entrar.",
+      "email",
+      "email_nao_confirmado"
+    );
   }
   if (m.includes("already registered") || m.includes("already been registered")) {
     return new AuthError("Já existe uma conta com esse e-mail.", "email");
