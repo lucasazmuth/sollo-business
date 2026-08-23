@@ -8,37 +8,25 @@ import { colors, radius, space, type } from "@/src/theme/tokens";
 import type { AccountType } from "@/src/lib/auth";
 
 /**
- * Sem selo de preço: nada de cobrança está integrado ainda, e anunciar
+ * Sem selo de preço: nenhuma cobrança está integrada ainda, e anunciar
  * valor numa tela de cadastro é promessa que o produto não cumpre hoje.
- * O que fica é o que cada conta faz.
  */
 const options: {
   id: AccountType;
   title: string;
   text: string;
-  itens: string[];
   accent: string;
 }[] = [
   {
     id: "profissional",
     title: "Sou profissional",
-    text: "Exponha seu trabalho e apareça para quem está contratando na sua região.",
-    itens: [
-      "Aviso na hora de vaga perto de você",
-      "Candidatura de um toque, sem formulário",
-      "Portfólio e reputação no seu perfil"
-    ],
+    text: "Exponha seu trabalho, candidate-se a vagas e receba pelos serviços entregues.",
     accent: colors.magenta
   },
   {
     id: "contratante",
     title: "Sou contratante",
-    text: "Publique a vaga e fale direto com quem pode assumir hoje.",
-    itens: [
-      "Notificamos os profissionais no seu raio",
-      "Candidatos com portfólio e avaliações",
-      "Combine os detalhes pelo chat"
-    ],
+    text: "Publique vagas, encontre talentos e combine os detalhes direto pelo chat.",
     accent: colors.lime
   }
 ];
@@ -77,15 +65,6 @@ export default function TipoDeConta() {
                 </View>
 
                 <Text style={styles.cardText}>{option.text}</Text>
-
-                <View style={styles.itens}>
-                  {option.itens.map((item) => (
-                    <View key={item} style={styles.item}>
-                      <View style={[styles.itemPonto, on && { backgroundColor: option.accent }]} />
-                      <Text style={styles.itemTexto}>{item}</Text>
-                    </View>
-                  ))}
-                </View>
               </Pressable>
             </Animated.View>
           );
@@ -130,9 +109,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
-  radioDot: { width: 12, height: 12, borderRadius: 6 },
-  itens: { gap: space.sm, marginTop: space.xs },
-  item: { flexDirection: "row", alignItems: "center", gap: space.md },
-  itemPonto: { width: 5, height: 5, borderRadius: 3, backgroundColor: colors.lineStrong },
-  itemTexto: { ...type.caption, color: colors.inkDim, flex: 1 }
+  radioDot: { width: 12, height: 12, borderRadius: 6 }
 });

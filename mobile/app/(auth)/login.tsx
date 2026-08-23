@@ -5,7 +5,6 @@ import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { Wordmark } from "@/src/components/Logo";
-import { Blobs } from "@/src/components/Blobs";
 import { ehAuthError, signIn } from "@/src/lib/auth";
 import { colors, space, type } from "@/src/theme/tokens";
 
@@ -44,18 +43,11 @@ export default function Login() {
   }
 
   return (
-    // Esferas mais fracas que na abertura: aqui a tela é formulário, e o
-    // fundo precisa dar continuidade de marca sem competir com os campos.
-    <Screen back fundo={<Blobs intensidade={0.4} />}>
+    <Screen back>
       <View style={styles.header}>
         <Wordmark width={104} />
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>ENTRAR
-        </Text>
         <Text style={styles.title}>Bem-vindo{"\n"}de volta.</Text>
-        <Text style={styles.lead}>
-          Suas vagas, candidaturas e conversas continuam de onde pararam.
-        </Text>
+        <Text style={styles.lead}>Entre para acompanhar seus projetos e conversas.</Text>
       </View>
 
       <View style={styles.form}>
@@ -110,10 +102,8 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  header: { gap: space.md, paddingTop: space.lg, paddingBottom: space["2xl"] },
-  eyebrow: { ...type.label, color: colors.inkDim, marginTop: space.md },
-  dot: { color: colors.magenta },
-  title: { ...type.display, color: colors.white },
+  header: { gap: space.lg, paddingTop: space.lg, paddingBottom: space["2xl"] },
+  title: { ...type.h1, color: colors.white },
   lead: { ...type.body, color: colors.inkDim },
   form: { flex: 1, gap: space.lg, paddingBottom: space.xl },
   forgotWrap: { alignSelf: "flex-start" },
