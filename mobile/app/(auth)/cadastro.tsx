@@ -37,7 +37,13 @@ export default function Cadastro() {
       const { precisaConfirmarEmail } = await signUp({ nome, email, senha, tipo });
 
       if (precisaConfirmarEmail) {
-        router.replace({ pathname: "/(auth)/confirmar-email", params: { email } });
+        // Precisa ser o mesmo e-mail normalizado que o signUp mandou pro
+        // Supabase — senão o verifyOtp da tela seguinte compara com um
+        // e-mail diferente do dono do código e sempre recusa.
+        router.replace({
+          pathname: "/(auth)/confirmar-email",
+          params: { email: email.trim().toLowerCase() }
+        });
       } else {
         router.replace("/home");
       }

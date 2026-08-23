@@ -22,12 +22,21 @@ export default function ConfirmarEmail() {
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
 
+  // Precisa bater exatamente com o e-mail normalizado que o signUp mandou
+  // pro Supabase — senão o verifyOtp compara com um e-mail diferente do
+  // dono do código e recusa mesmo com o código certo.
+  const emailNormalizado = email?.trim().toLowerCase();
+
   async function confirmar(valor: string) {
-    if (!email || valor.length !== 6) return;
+    if (!emailNormalizado || valor.length !== 6) return;
     setConfirmando(true);
     setErro(null);
 
-    const { error } = await supabase.auth.verifyOtp({ email, token: valor, type: "signup" });
+    const { error } = await supabase.auth.verifyOtp({
+      email: emailNormalizado,
+      token: valor,
+      type: "signup"
+    });
 
     if (error) {
       setErro("Código incorreto ou expirado. Confira o e-mail ou peça um novo.");
@@ -39,12 +48,12 @@ export default function ConfirmarEmail() {
   }
 
   async function reenviar() {
-    if (!email) return;
+    if (!emailNormalizado) return;
     setReenviando(true);
     setAviso(null);
     setErro(null);
 
-    const { error } = await supabase.auth.resend({ type: "signup", email });
+    const { error } = await supabase.auth.resend({ type: "signup", email: emailNormalizado });
 
     setAviso(
       error
@@ -62,7 +71,7 @@ export default function ConfirmarEmail() {
         </Text>
         <Text style={styles.title}>Confirme{"\n"}seu e-mail.</Text>
         <Text style={styles.lead}>
-          Mandamos um código de 6 dígitos para {email ?? "seu e-mail"}. Digite abaixo.
+          Mandamos um código de 6 dígitos para {emailNormalizado ?? "seu e-mail"}. Digite abaixo.
         </Text>
       </View>
 
