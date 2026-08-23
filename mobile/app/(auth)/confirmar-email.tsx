@@ -32,10 +32,14 @@ export default function ConfirmarEmail() {
     setConfirmando(true);
     setErro(null);
 
+    // "email" é o tipo certo pra verificar o código de 6 dígitos aqui —
+    // "signup" é o tipo usado no OUTRO fluxo (link de confirmação por
+    // token_hash), não no verifyOtp de código. Usar "signup" aqui faz o
+    // Supabase recusar até o código certo com "Token has expired or is invalid".
     const { error } = await supabase.auth.verifyOtp({
       email: emailNormalizado,
       token: valor,
-      type: "signup"
+      type: "email"
     });
 
     if (error) {
