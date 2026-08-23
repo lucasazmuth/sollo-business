@@ -26,7 +26,8 @@ app/                        rotas (expo-router, file-based)
     tipo-de-conta.tsx       profissional × contratante (passo 1 de 2)
     cadastro.tsx            nome, e-mail, senha e termos (passo 2 de 2)
     login.tsx               e-mail e senha
-    recuperar-senha.tsx     link de redefinição
+    recuperar-senha.tsx     pede o link de redefinição
+    redefinir-senha.tsx     recebe o deep link e define a nova senha
     confirmar-email.tsx     aguarda confirmação após o cadastro
   (app)/
     _layout.tsx             guarda de rota: sem sessão, volta para auth
@@ -476,14 +477,33 @@ já existia), levando pra `perfil/completar-cadastro.tsx` (CPF com dígito verif
 novas funções `SECURITY DEFINER`, mesmo padrão de `is_job_owner`/`me_candidatei`) — mesmo que alguém
 contorne a checagem client-side, o banco recusa.
 
+## Redefinição de senha (deep link)
+
+`recuperar-senha.tsx` pede o reset via `resetPasswordForEmail({ redirectTo: "sollo://redefinir-senha" })`.
+Como o client roda com `detectSessionInUrl: false` (a config certa pra React Native — sem isso ele
+tenta ler token de uma URL de browser que não existe aqui), quem processa esse link é a própria
+tela nova `(auth)/redefinir-senha.tsx`, na mão: lê a URL que abriu o app (`expo-linking`), extrai
+`access_token`/`refresh_token` do fragmento (`#...`), ativa a sessão de recuperação com
+`setSession`, e só então deixa definir a nova senha via `updateUser({ password })`.
+
+Pra esse link funcionar de ponta a ponta, o Supabase precisa saber que essas URLs são permitidas —
+**Dashboard → Authentication → URL Configuration**:
+
+- **Site URL**: `https://www.sollo.business`
+- **Redirect URLs**: `sollo://redefinir-senha` (app nativo) e `https://app.sollo.business/redefinir-senha`
+  (mesma tela na versão web, quando publicada nesse subdomínio)
+
 ## Pendências
 
-1. **Template de e-mail do Supabase Auth** — trocar de link mágico para código (`{{ .Token }}`) no
-   Dashboard antes do PIN de confirmação funcionar de verdade (ver seção acima).
-2. **Integração com o Asaas** — o botão "Destacar vaga" está pronto na UI, falta o backend de
+1. **SMTP do Auth** — o Supabase só libera editar o template de e-mail (pra trocar o link mágico
+   pelo código `{{ .Token }}`) depois que um SMTP customizado é configurado. Apontar pro Resend
+   (Dashboard → Authentication → Emails → SMTP Settings: host `smtp.resend.com`, porta `587`,
+   usuário `resend`, senha = `RESEND_API_KEY`, remetente de um domínio verificado no Resend — não
+   dá pra usar `onboarding@resend.dev`, que só entrega pro dono da conta). Resolve de uma vez o
+   template do PIN e o teto baixo de e-mails/hora do SMTP padrão do Supabase.
+2. **URL Configuration** — ver seção acima; sem isso o link de redefinição de senha cai no Site URL
+   em vez de abrir o app.
+3. **Integração com o Asaas** — o botão "Destacar vaga" está pronto na UI, falta o backend de
    pagamento de verdade (webhook de confirmação de PIX, atualização de `destacada_ate`).
-3. **SMTP do Auth** — apontar para o Resend antes de abrir cadastro público.
 4. **Login social** (Google/Apple) — não implementado; Apple Sign In é exigido pela App Store
    se houver login social de terceiros.
-5. **Domínio `www.sollo.business`** — os links de termos/privacidade assumem esse domínio; ajustar
-   se o domínio de produção mudar antes de builds de loja.
