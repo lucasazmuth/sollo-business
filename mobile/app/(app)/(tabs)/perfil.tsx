@@ -192,9 +192,6 @@ export default function MeuPerfil() {
               "Editar perfil". O (+) e o botão dizem para onde ir. */}
           {portfolio.length === 0 ? (
             <Pressable style={styles.vazio} onPress={irParaPortfolio}>
-              <View style={styles.vazioMais}>
-                <Text style={styles.vazioMaisSinal}>+</Text>
-              </View>
               <Text style={styles.vazioTitulo}>Seu portfólio está vazio</Text>
               <Text style={styles.vazioTexto}>
                 É por aqui que o contratante decide. Suba pelo menos três trabalhos.
@@ -312,17 +309,6 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderColor: colors.lineStrong
   },
-  vazioMais: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: colors.magenta,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: space.xs
-  },
-  vazioMaisSinal: { ...type.h2, color: colors.magenta, marginTop: -3 },
   vazioTitulo: { ...type.h3, color: colors.white },
   vazioTexto: { ...type.body, color: colors.inkDim },
   vazioBotao: {
