@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
-import { AuthError, passwordIssue, signUp, type AccountType } from "@/src/lib/auth";
+import { ehAuthError, passwordIssue, signUp, type AccountType } from "@/src/lib/auth";
 import { colors, space, type } from "@/src/theme/tokens";
 
 export default function Cadastro() {
@@ -48,7 +48,7 @@ export default function Cadastro() {
         router.replace("/home");
       }
     } catch (e) {
-      if (e instanceof AuthError && e.field) setErrors({ [e.field]: e.message });
+      if (ehAuthError(e) && e.field) setErrors({ [e.field]: e.message });
       else setErrors({ geral: "Não foi possível criar sua conta agora." });
     } finally {
       setLoading(false);

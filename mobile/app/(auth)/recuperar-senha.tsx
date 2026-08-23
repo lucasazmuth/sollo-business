@@ -5,7 +5,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
-import { AuthError, requestPasswordReset } from "@/src/lib/auth";
+import { ehAuthError, requestPasswordReset } from "@/src/lib/auth";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 export default function RecuperarSenha() {
@@ -22,7 +22,7 @@ export default function RecuperarSenha() {
       await requestPasswordReset(email);
       setSent(true);
     } catch (e) {
-      setError(e instanceof AuthError ? e.message : "Não foi possível enviar agora.");
+      setError(ehAuthError(e) ? e.message : "Não foi possível enviar agora.");
     } finally {
       setLoading(false);
     }

@@ -5,7 +5,7 @@ import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { Wordmark } from "@/src/components/Logo";
-import { AuthError, signIn } from "@/src/lib/auth";
+import { ehAuthError, signIn } from "@/src/lib/auth";
 import { colors, space, type } from "@/src/theme/tokens";
 
 export default function Login() {
@@ -27,7 +27,7 @@ export default function Login() {
       // Conta existe mas o e-mail nunca foi confirmado: em vez de deixar a
       // pessoa presa num erro sem saída, leva pra tela do código (que tem o
       // botão de reenviar). Era a única forma de chegar lá depois do cadastro.
-      if (e instanceof AuthError && e.motivo === "email_nao_confirmado") {
+      if (ehAuthError(e) && e.motivo === "email_nao_confirmado") {
         router.push({
           pathname: "/(auth)/confirmar-email",
           params: { email: email.trim().toLowerCase() }
@@ -35,7 +35,7 @@ export default function Login() {
         return;
       }
 
-      if (e instanceof AuthError && e.field) setErrors({ [e.field]: e.message });
+      if (ehAuthError(e) && e.field) setErrors({ [e.field]: e.message });
       else setErrors({ geral: "Não foi possível entrar agora." });
     } finally {
       setLoading(false);

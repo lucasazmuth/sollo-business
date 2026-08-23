@@ -31,6 +31,18 @@ export class AuthError extends Error {
   }
 }
 
+/**
+ * Use isto em vez de `e instanceof AuthError` nas telas.
+ *
+ * `instanceof` compara identidade de classe, e o Fast Refresh redefine a
+ * classe quando só um dos módulos recarrega — a tela passa a comparar contra
+ * uma classe diferente da que foi lançada e a checagem falha em silêncio,
+ * caindo no erro genérico. Checar pelo `name` é estável entre recargas.
+ */
+export function ehAuthError(e: unknown): e is AuthError {
+  return e instanceof Error && e.name === "AuthError";
+}
+
 export const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 
 /** Regras mínimas de senha usadas no cadastro. */
