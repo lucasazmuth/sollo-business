@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { Session as SupabaseSession } from "@supabase/supabase-js";
 import { supabase } from "@/src/lib/supabase";
+import { signOut as sairDaConta } from "@/src/lib/auth";
 import { desregistrarPush } from "@/src/lib/notifications";
 import type { Tables } from "@/src/types/database";
 
@@ -84,7 +85,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     // Tira o token antes de perder a sessão: senão o aparelho continua
     // recebendo push de uma conta que já saiu.
     await desregistrarPush().catch(() => {});
-    await supabase.auth.signOut();
+
+    // `sairDaConta` já tem fallback local, mas o estado é zerado aqui de
+    // qualquer jeito: se algo falhar no caminho, a pessoa não pode ficar
+    // presa numa tela logada sem saída.
+    await sairDaConta().catch(() => {});
+    setSession(null);
     setProfile(null);
   }, []);
 

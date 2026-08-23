@@ -13,7 +13,7 @@ import { colors, radius, space, type } from "@/src/theme/tokens";
 
 export default function MeuPerfil() {
   const router = useRouter();
-  const { session } = useSession();
+  const { session, signOut } = useSession();
   const { width } = useWindowDimensions();
 
   const [perfil, setPerfil] = useState<PerfilCompleto | null>(null);
@@ -41,11 +41,38 @@ export default function MeuPerfil() {
     }, [session?.user.id])
   );
 
-  if (carregando || !perfil) {
+  if (carregando) {
     return (
       <Screen scroll={false}>
         <View style={styles.centro}>
           <ActivityIndicator color={colors.magenta} />
+        </View>
+      </Screen>
+    );
+  }
+
+  // Sessão válida no aparelho, mas sem perfil no banco: acontece quando a
+  // conta foi apagada por fora (painel do Supabase) e o token continua no
+  // Keychain. Antes isso caía no mesmo `if` do loading e girava para sempre
+  // — e como o botão de sair vive nesta tela, a pessoa ficava presa dentro
+  // do app sem nenhuma saída.
+  if (!perfil) {
+    return (
+      <Screen scroll={false}>
+        <View style={styles.centro}>
+          <Text style={styles.erroTitulo}>Conta indisponível</Text>
+          <Text style={styles.erroTexto}>
+            Não encontramos seu perfil. Se a conta foi removida, saia e entre de novo.
+          </Text>
+          <Pressable
+            style={styles.botaoSair}
+            onPress={async () => {
+              await signOut().catch(() => {});
+              router.replace("/(auth)/welcome");
+            }}
+          >
+            <Text style={styles.botaoSairTexto}>SAIR DA CONTA</Text>
+          </Pressable>
         </View>
       </Screen>
     );
@@ -180,7 +207,20 @@ function Metric({ valor, rotulo }: { valor: string; rotulo: string }) {
 }
 
 const styles = StyleSheet.create({
-  centro: { flex: 1, alignItems: "center", justifyContent: "center" },
+  centro: { flex: 1, alignItems: "center", justifyContent: "center", gap: space.md },
+  erroTitulo: { ...type.h2, color: colors.white, textAlign: "center" },
+  erroTexto: { ...type.body, color: colors.inkDim, textAlign: "center" },
+  botaoSair: {
+    marginTop: space.lg,
+    height: 52,
+    paddingHorizontal: space.xl,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.lineStrong,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  botaoSairTexto: { ...type.button, color: colors.white },
   topo: { flexDirection: "row", gap: space.lg, alignItems: "center", paddingTop: space.lg },
   identidade: { flex: 1, gap: 2 },
   nome: { ...type.h2, color: colors.white },

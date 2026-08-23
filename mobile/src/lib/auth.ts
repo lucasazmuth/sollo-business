@@ -134,8 +134,26 @@ export async function requestPasswordReset(email: string): Promise<void> {
   if (error) throw traduz(error.message);
 }
 
+/**
+ * Encerra a sessão no servidor, mas **nunca** deixa a pessoa presa no app
+ * se isso falhar.
+ *
+ * O `signOut()` padrão chama a API com o token atual. Quando esse token não
+ * vale mais — conta apagada no painel, token revogado, refresh expirado ou
+ * simplesmente sem rede — a chamada falha e a sessão local continua no
+ * Keychain: o app segue "logado" numa conta que não existe, sem botão de
+ * saída que funcione. O fallback com `scope: "local"` só limpa o
+ * armazenamento local, sem depender do servidor.
+ */
 export async function signOut(): Promise<void> {
-  await supabase.auth.signOut();
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (!error) return;
+  } catch {
+    // Cai no fallback local abaixo.
+  }
+
+  await supabase.auth.signOut({ scope: "local" }).catch(() => {});
 }
 
 /**

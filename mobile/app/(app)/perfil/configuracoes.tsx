@@ -2,11 +2,16 @@ import { useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Screen } from "@/src/components/Screen";
-import { excluirConta, signOut } from "@/src/lib/auth";
+import { excluirConta } from "@/src/lib/auth";
+import { useSession } from "@/src/lib/session";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 export default function Configuracoes() {
   const router = useRouter();
+  // O signOut do contexto também desregistra o push e zera o estado da
+  // sessão — o de `lib/auth` sozinho deixaria o aparelho recebendo push
+  // de uma conta que já saiu.
+  const { signOut } = useSession();
   const [excluindo, setExcluindo] = useState(false);
 
   function confirmarExclusao() {
@@ -44,7 +49,10 @@ export default function Configuracoes() {
         <Pressable
           style={styles.item}
           onPress={async () => {
-            await signOut();
+            // Sair da conta não pode depender de a chamada dar certo: se o
+            // token já não vale (conta apagada, sem rede), a pessoa precisa
+            // sair da tela logada do mesmo jeito.
+            await signOut().catch(() => {});
             router.replace("/(auth)/welcome");
           }}
         >
