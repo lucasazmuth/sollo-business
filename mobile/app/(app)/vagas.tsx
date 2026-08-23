@@ -86,7 +86,7 @@ export default function MinhasVagas() {
                   </Text>
 
                   <View style={styles.cardRodape}>
-                    <Text style={styles.categoria}>{v.categories?.nome ?? "—"}</Text>
+                    <Text style={styles.categoria}>{v.categories?.nome ?? "-"}</Text>
                     <Text style={[styles.candidaturas, candidaturas > 0 && { color: colors.magenta }]}>
                       {candidaturas === 0
                         ? "sem candidaturas"

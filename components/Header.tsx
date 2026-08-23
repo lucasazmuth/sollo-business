@@ -74,7 +74,7 @@ export function Header() {
     <>
       <header className="header" ref={header}>
         <div className="wrap header__row">
-          <a className="header__logo mark" href="#top" aria-label="Sollo Business — início">
+          <a className="header__logo mark" href="#top" aria-label="Sollo Business, início">
             <Wordmark className="mark" />
           </a>
 

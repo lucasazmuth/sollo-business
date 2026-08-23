@@ -55,7 +55,7 @@ export function VagaCard({ vaga, onPress, jaAplicou }: Props) {
         <View style={styles.rodape}>
           {/* Distância primeiro: é o que decide se vale a pena. */}
           <Text style={styles.distancia}>
-            {vaga.distancia_km !== null ? `${vaga.distancia_km} km` : "—"}
+            {vaga.distancia_km !== null ? `${vaga.distancia_km} km` : "-"}
           </Text>
           <Text style={styles.separador}>·</Text>
           <Text style={styles.data}>{formatarDataHora(new Date(vaga.starts_at))}</Text>

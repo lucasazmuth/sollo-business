@@ -36,7 +36,7 @@ export default function Avaliar() {
     setEnviando(true);
     try {
       await enviarAvaliacao({ jobId, raterId: meuId, ratedId, nota, comentario });
-      Alert.alert("Avaliação enviada", "Obrigado — isso ajuda toda a comunidade.", [
+      Alert.alert("Avaliação enviada", "Obrigado, isso ajuda toda a comunidade.", [
         { text: "OK", onPress: () => router.back() }
       ]);
     } catch (e) {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { site } from "@/content/site";
 
 export const metadata: Metadata = {
-  title: `Política de privacidade — ${site.name}`,
+  title: `Política de privacidade: ${site.name}`,
   description: "Como a Sollo Business trata os dados dos usuários."
 };
 
@@ -59,7 +59,7 @@ export default function Privacidade() {
           contrato: <strong>Supabase</strong> (banco de dados e autenticação), <strong>Resend</strong>{" "}
           (envio de e-mail) e os serviços de push do sistema operacional (<strong>Apple/Google</strong>).
           Seu perfil público (nome, foto, portfólio, avaliações) é visível a outros usuários da
-          plataforma — é o que permite ser encontrado e contratado.
+          plataforma. É o que permite ser encontrado e contratado.
         </p>
 
         <h2>4. Por quanto tempo guardamos</h2>

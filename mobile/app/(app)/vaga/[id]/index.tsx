@@ -163,7 +163,7 @@ export default function DetalheVaga() {
         <Fato rotulo="QUANDO" valor={formatarDataHora(new Date(vaga.starts_at))} />
         <Fato
           rotulo="ONDE"
-          valor={vaga.endereco_texto ?? [vaga.cidade, vaga.uf].filter(Boolean).join("/") ?? "—"}
+          valor={vaga.endereco_texto ?? [vaga.cidade, vaga.uf].filter(Boolean).join("/") ?? "-"}
         />
         <Fato
           rotulo="CACHÊ"

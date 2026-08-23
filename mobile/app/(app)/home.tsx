@@ -26,7 +26,7 @@ export default function Home() {
       <View style={styles.center}>
         <Text style={styles.title}>Olá,{"\n"}{profile?.nome ?? "por aí"}.</Text>
         <Text style={styles.lead}>
-          Sua conta está pronta. As próximas telas — perfil, anúncios, chat e orçamentos — entram a
+          Sua conta está pronta. As próximas telas (perfil, anúncios, chat e orçamentos) entram a
           partir daqui.
         </Text>
 

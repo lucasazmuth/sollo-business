@@ -97,7 +97,7 @@ export default function MeuPerfil() {
 
       <View style={styles.metricas}>
         <Metric
-          valor={professional?.rating_avg ? Number(professional.rating_avg).toFixed(1) : "—"}
+          valor={professional?.rating_avg ? Number(professional.rating_avg).toFixed(1) : "-"}
           rotulo="avaliação"
         />
         <Metric valor={String(professional?.rating_count ?? 0)} rotulo="trabalhos" />

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { site } from "@/content/site";
 
 export const metadata: Metadata = {
-  title: `Termos de uso — ${site.name}`,
+  title: `Termos de uso: ${site.name}`,
   description: "Termos de uso da Sollo Business."
 };
 
@@ -27,7 +27,7 @@ export default function Termos() {
         <p>
           Nesta fase, a Sollo Business é um app de descoberta e contato: publicação de vagas,
           candidatura, chat entre as partes e avaliação mútua ao fim do trabalho. A plataforma{" "}
-          <strong>não processa pagamentos</strong> — valores e forma de pagamento pelo serviço são
+          <strong>não processa pagamentos</strong>: valores e forma de pagamento pelo serviço são
           combinados diretamente entre contratante e profissional, fora do app.
         </p>
 
@@ -40,7 +40,7 @@ export default function Termos() {
 
         <h2>3. Publicação de vagas</h2>
         <p>
-          Contratantes são responsáveis pelo conteúdo e pela veracidade das vagas publicadas —
+          Contratantes são responsáveis pelo conteúdo e pela veracidade das vagas publicadas:
           local, data, valor combinado e demais condições. A Sollo Business não garante a
           realização do trabalho nem atua como parte na relação entre contratante e profissional.
         </p>
@@ -74,7 +74,7 @@ export default function Termos() {
 
         <h2>8. Mudanças nestes termos</h2>
         <p>
-          Podemos atualizar estes termos conforme o produto evolui — em especial quando um fluxo
+          Podemos atualizar estes termos conforme o produto evolui, em especial quando um fluxo
           de pagamento for adicionado à plataforma. Mudanças relevantes serão avisadas no app.
         </p>
 

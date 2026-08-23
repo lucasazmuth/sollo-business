@@ -6,7 +6,7 @@
 export const site = {
   name: "Sollo Business",
   email: "contato@sollo.business",
-  title: "Sollo Business — O marketplace pensado para o mercado do entretenimento",
+  title: "Sollo Business: o marketplace pensado para o mercado do entretenimento",
   description:
     "Encontre os melhores talentos do mercado, colabore em projetos e tire suas ideias do papel. Conecte-se, negocie e entregue com facilidade e segurança."
 };
@@ -39,7 +39,7 @@ export const steps = [
     n: "02",
     label: "Etapa 2",
     title: "Combine direto pelo chat",
-    text: "Vocês fecham valores e prazos direto pelo chat integrado, sem intermediário — o pagamento é combinado entre as partes."
+    text: "Vocês fecham valores e prazos direto pelo chat integrado, sem intermediário: o pagamento é combinado entre as partes."
   },
   {
     n: "03",
@@ -51,7 +51,7 @@ export const steps = [
     n: "04",
     label: "Etapa 4",
     title: "Avaliação em duas vias",
-    text: "Depois da entrega, cliente e profissional se avaliam mutuamente — é essa reputação que decide quem entra na próxima vaga."
+    text: "Depois da entrega, cliente e profissional se avaliam mutuamente. É essa reputação que decide quem entra na próxima vaga."
   }
 ];
 
@@ -73,7 +73,7 @@ export const services = [
     n: "02",
     title: "Publicar anúncios",
     sub: "Publique e receba candidaturas",
-    text: "Crie e publique sua vaga na Sollo Business e receba candidaturas de profissionais dentro do raio que você definir — quanto mais urgente, mais rápido a notificação chega perto de você."
+    text: "Crie e publique sua vaga na Sollo Business e receba candidaturas de profissionais dentro do raio que você definir. Quanto mais urgente, mais rápido a notificação chega perto de você."
   },
   {
     n: "03",
@@ -94,7 +94,7 @@ export const connectTabs = [
     id: "contratantes",
     tab: "Com contratantes",
     title: "Anuncie sua vaga",
-    text: "Na Sollo Business, você pode se conectar com uma comunidade de profissionais criativos e qualificados com facilidade. É só publicar suas vagas e encontrar candidatos ideais em uma plataforma integrada e prática. Não perca tempo — encontre o talento que você precisa agora mesmo!",
+    text: "Na Sollo Business, você pode se conectar com uma comunidade de profissionais criativos e qualificados com facilidade. É só publicar suas vagas e encontrar candidatos ideais em uma plataforma integrada e prática. Não perca tempo, encontre o talento que você precisa agora mesmo!",
     stats: [
       { n: "200+", l: "tipos de serviços" },
       { n: "0", l: "custo por anúncio" },
@@ -175,7 +175,7 @@ export const faq = [
   },
   {
     q: "Quais áreas do entretenimento estão na plataforma?",
-    a: "Audiovisual, design, música, fotografia, produção de eventos e muitas outras — são mais de 200 tipos de serviços disponíveis."
+    a: "Audiovisual, design, música, fotografia, produção de eventos e muitas outras. São mais de 200 tipos de serviços disponíveis."
   }
 ];
 

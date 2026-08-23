@@ -97,7 +97,7 @@ export default function PerfilPublico() {
               ? Number(professional.rating_avg).toFixed(1)
               : hirer?.rating_avg
                 ? Number(hirer.rating_avg).toFixed(1)
-                : "—"
+                : "-"
           }
           rotulo="avaliação"
         />

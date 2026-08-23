@@ -70,7 +70,7 @@ export default function MinhasCandidaturas() {
         <View style={styles.vazio}>
           <Text style={styles.vazioTitulo}>Comece pelo feed</Text>
           <Text style={styles.vazioTexto}>
-            Candidatar leva um toque — seu perfil já é a inscrição.
+            Candidatar leva um toque: seu perfil já é a inscrição.
           </Text>
           <Button
             label="Ver vagas perto de mim"

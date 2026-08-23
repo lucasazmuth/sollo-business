@@ -61,7 +61,7 @@ export default function Conversas() {
         <View style={styles.vazio}>
           <Text style={styles.vazioTitulo}>Nenhuma conversa ainda</Text>
           <Text style={styles.vazioTexto}>
-            A conversa nasce junto com a candidatura — quando alguém se candidatar, o canal já
+            A conversa nasce junto com a candidatura. Quando alguém se candidatar, o canal já
             estará aberto aqui.
           </Text>
         </View>
@@ -84,7 +84,7 @@ export default function Conversas() {
                   </View>
 
                   <Text style={styles.vaga} numberOfLines={1}>
-                    {c.jobs?.titulo ?? "—"}
+                    {c.jobs?.titulo ?? "-"}
                   </Text>
 
                   <Text

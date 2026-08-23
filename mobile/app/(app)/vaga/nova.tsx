@@ -75,7 +75,7 @@ export default function NovaVaga() {
     const e: Record<string, string> = {};
     if (titulo.trim().length < 5) e.titulo = "Dê um título que diga a função.";
     if (descricao.trim().length < 20) e.descricao = "Descreva o que precisa em pelo menos uma frase.";
-    if (!categoryId) e.categoria = "Escolha a categoria — é por ela que notificamos.";
+    if (!categoryId) e.categoria = "Escolha a categoria: é por ela que notificamos.";
     if (!local) e.local = "Confirme o endereço para podermos avisar quem está perto.";
     if (inicio.getTime() <= Date.now()) e.data = "A data precisa estar no futuro.";
     if (comValor && !Number(valor.replace(",", "."))) e.valor = "Informe o cachê ou marque a combinar.";
