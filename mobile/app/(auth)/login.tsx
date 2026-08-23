@@ -22,7 +22,7 @@ export default function Login() {
     setLoading(true);
     try {
       await signIn(email, senha);
-      router.replace("/(app)/home");
+      router.replace("/home");
     } catch (e) {
       if (e instanceof AuthError && e.field) setErrors({ [e.field]: e.message });
       else setErrors({ geral: "Não foi possível entrar agora." });

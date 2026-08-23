@@ -4,6 +4,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
 import { Avatar } from "@/src/components/Avatar";
+import { NotificationBell } from "@/src/components/NotificationBell";
 import { useSession } from "@/src/lib/session";
 import { listarConversas, type ConversaDaLista } from "@/src/api/chat";
 import { colors, radius, space, type } from "@/src/theme/tokens";
@@ -43,7 +44,7 @@ export default function Conversas() {
   const naoLidas = itens.reduce((t, c) => t + c.naoLidas, 0);
 
   return (
-    <Screen back>
+    <Screen right={<NotificationBell />}>
       <View style={styles.cabecalho}>
         <Text style={styles.eyebrow}>
           <Text style={styles.dot}>● </Text>CONVERSAS

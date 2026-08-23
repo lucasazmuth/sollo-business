@@ -10,10 +10,11 @@ import {
 } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/src/components/Button";
 import { Chip } from "@/src/components/Chip";
 import { VagaCard } from "@/src/components/VagaCard";
+import { NotificationBell } from "@/src/components/NotificationBell";
 import { useSession } from "@/src/lib/session";
 import { buscarFeed, contarNoRaio, type VagaDoFeed } from "@/src/api/feed";
 import { buscarPerfil, listarCategorias, type Category } from "@/src/api/profile";
@@ -22,7 +23,7 @@ import { colors, radius, space, type } from "@/src/theme/tokens";
 
 const RAIOS = [10, 20, 30, 50, 100];
 
-export default function Feed() {
+export function FeedProfissional() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { session, profile } = useSession();
@@ -93,8 +94,8 @@ export default function Feed() {
   const filtrosAtivos = (raio !== null ? 1 : 0) + (categoriaFiltro ? 1 : 0) + (apenasUrgentes ? 1 : 0);
 
   return (
-    <View style={styles.root}>
-      <View style={[styles.cabecalho, { paddingTop: insets.top + space.md }]}>
+    <SafeAreaView style={styles.root} edges={["top"]}>
+      <View style={styles.cabecalho}>
         <View style={styles.tituloLinha}>
           <View style={{ flex: 1 }}>
             <Text style={styles.eyebrow}>
@@ -115,6 +116,8 @@ export default function Feed() {
               FILTROS{filtrosAtivos > 0 ? ` · ${filtrosAtivos}` : ""}
             </Text>
           </Pressable>
+
+          <NotificationBell />
         </View>
 
         {filtrosAbertos && (
@@ -222,7 +225,7 @@ export default function Feed() {
           ))
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -24,8 +24,8 @@ const options: {
   {
     id: "contratante",
     title: "Sou contratante",
-    text: "Publique vagas, encontre talentos e contrate com pagamento garantido pela plataforma.",
-    badge: "5% · por serviço entregue",
+    text: "Publique vagas, encontre talentos e combine os detalhes direto pelo chat.",
+    badge: "R$ 0 · destaque opcional por R$ 7,90",
     accent: colors.lime
   }
 ];

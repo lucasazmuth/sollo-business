@@ -74,7 +74,7 @@ export default function MinhasCandidaturas() {
           </Text>
           <Button
             label="Ver vagas perto de mim"
-            onPress={() => router.push("/(app)/feed")}
+            onPress={() => router.push("/vagas")}
             style={{ marginTop: space.lg }}
           />
         </View>

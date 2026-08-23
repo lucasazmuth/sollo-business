@@ -39,7 +39,7 @@ export default function Cadastro() {
       if (precisaConfirmarEmail) {
         router.replace({ pathname: "/(auth)/confirmar-email", params: { email } });
       } else {
-        router.replace("/(app)/home");
+        router.replace("/home");
       }
     } catch (e) {
       if (e instanceof AuthError && e.field) setErrors({ [e.field]: e.message });

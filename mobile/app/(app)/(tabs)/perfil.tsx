@@ -6,6 +6,7 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
 import { Avatar } from "@/src/components/Avatar";
 import { Chip } from "@/src/components/Chip";
+import { NotificationBell } from "@/src/components/NotificationBell";
 import { useSession } from "@/src/lib/session";
 import { buscarPerfil, listarCategorias, type PerfilCompleto, type Category } from "@/src/api/profile";
 import { colors, radius, space, type } from "@/src/theme/tokens";
@@ -63,7 +64,7 @@ export default function MeuPerfil() {
   const celula = (larguraUtil - gap * 2) / 3;
 
   return (
-    <Screen back>
+    <Screen right={<NotificationBell />}>
       <Animated.View entering={FadeIn.duration(400)} style={styles.topo}>
         <Avatar
           url={profile.avatar_url}

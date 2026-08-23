@@ -4,6 +4,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
+import { NotificationBell } from "@/src/components/NotificationBell";
 import { useSession } from "@/src/lib/session";
 import { minhasVagas, type VagaDaLista } from "@/src/api/jobs";
 import { formatarDataHora } from "@/src/components/DataHoraInput";
@@ -17,7 +18,7 @@ const CORES_STATUS: Record<string, string> = {
   cancelada: colors.danger
 };
 
-export default function MinhasVagas() {
+export function MinhasVagasContratante() {
   const router = useRouter();
   const { session } = useSession();
   const [vagas, setVagas] = useState<VagaDaLista[]>([]);
@@ -41,7 +42,7 @@ export default function MinhasVagas() {
   );
 
   return (
-    <Screen back>
+    <Screen right={<NotificationBell />}>
       <View style={styles.cabecalho}>
         <Text style={styles.titulo}>Minhas vagas</Text>
         <Text style={styles.lead}>

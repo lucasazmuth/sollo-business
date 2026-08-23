@@ -45,7 +45,7 @@ export default function Splash() {
 
     const t = setTimeout(() => {
       navegou.current = true;
-      router.replace(temSessao ? "/(app)/home" : "/(auth)/welcome");
+      router.replace(temSessao ? "/home" : "/(auth)/welcome");
     }, HOLD_MS);
 
     return () => clearTimeout(t);

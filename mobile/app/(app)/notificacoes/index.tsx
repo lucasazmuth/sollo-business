@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSession } from "@/src/lib/session";
 import {
   listarNotificacoes,
@@ -72,9 +72,19 @@ export default function Notificacoes() {
   const naoLidas = itens.filter((i) => !i.read_at).length;
 
   return (
-    <View style={styles.root}>
-      <View style={[styles.cabecalho, { paddingTop: insets.top + space.md }]}>
+    <SafeAreaView style={styles.root} edges={["top"]}>
+      <View style={styles.cabecalho}>
         <View style={styles.linhaTopo}>
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={16}
+            accessibilityRole="button"
+            accessibilityLabel="Voltar"
+            style={styles.botaoVoltar}
+          >
+            <Text style={styles.botaoVoltarIcon}>←</Text>
+          </Pressable>
+
           <View style={{ flex: 1 }}>
             <Text style={styles.eyebrow}>
               <Text style={styles.dot}>● </Text>NOTIFICAÇÕES
@@ -164,7 +174,7 @@ export default function Notificacoes() {
           ))
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -172,11 +182,22 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   cabecalho: {
     paddingHorizontal: space.xl,
+    paddingTop: space.md,
     paddingBottom: space.lg,
     borderBottomWidth: 1,
     borderBottomColor: colors.line
   },
   linhaTopo: { flexDirection: "row", alignItems: "flex-end", gap: space.md },
+  botaoVoltar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: colors.line,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  botaoVoltarIcon: { ...type.h3, color: colors.white, marginTop: -2 },
   eyebrow: { ...type.label, color: colors.inkDim },
   dot: { color: colors.magenta },
   titulo: { ...type.h2, color: colors.white, marginTop: space.sm },
