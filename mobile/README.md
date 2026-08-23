@@ -460,14 +460,38 @@ Publicar vaga passou a exigir e-mail confirmado, nome completo, CPF válido, tel
 **PIN substitui o link mágico**, pras duas personas, não só pro contratante: `verifyOtp` da própria
 lib do Supabase Auth, decidido assim porque manter dois mecanismos de confirmação (link pra um tipo
 de conta, código pro outro) seria complexidade sem ganho, e código tende a converter melhor que link
-em mobile. `(auth)/confirmar-email.tsx` foi reescrita: era "abra o link", virou um campo de 6 dígitos
-(`src/components/PinInput.tsx`, novo — caixas decorativas + um `TextInput` real invisível por cima,
-pra herdar autofill de código do SMS/e-mail de graça).
+em mobile. `(auth)/confirmar-email.tsx` foi reescrita: era "abra o link", virou um campo de dígitos
+(`src/components/PinInput.tsx`, novo — caixas decorativas com largura flexível (`flex: 1`, não fixa)
++ um `TextInput` real invisível por cima, pra herdar autofill de código do SMS/e-mail de graça).
 
-⚠️ **Isso exige uma troca manual no Dashboard do Supabase** (Authentication → Email Templates →
-Confirm signup: trocar `{{ .ConfirmationURL }}` por `{{ .Token }}`) — não é algo que uma migration
-resolve. Até essa troca acontecer, o e-mail que sai continua sendo o link antigo, e `verifyOtp` não
-vai ter código nenhum pra validar.
+⚠️ **Isso exige duas trocas manuais no Dashboard do Supabase**, nenhuma delas cabe numa migration:
+
+1. **Emails → SMTP Settings**: o Supabase só libera editar o template de e-mail depois que um SMTP
+   customizado é configurado (não é bloqueio de plano pago — é a mensagem "Set up custom SMTP to
+   edit templates"). Apontar pro Resend: host `smtp.resend.com`, porta `587`, usuário `resend`,
+   senha = `RESEND_API_KEY`, remetente de um domínio verificado no Resend.
+2. **Emails → Templates → Confirm signup**: trocar `{{ .ConfirmationURL }}` pelo código
+   `{{ .Token }}` no corpo (como texto, não como `href` de um link — o editor do Supabase às vezes
+   sugere `<a href="{{ .Token }}">`, que é inválido).
+
+Até essas duas trocas acontecerem, o e-mail que sai continua sendo o link antigo do Supabase, e
+`verifyOtp` não tem código nenhum pra validar.
+
+### Duas armadilhas que custaram tempo de debug
+
+- **`type` errado no `verifyOtp`**: o tipo certo pra verificar o código de confirmação de signup é
+  `"email"`, não `"signup"` — esse último é do OUTRO fluxo (link com `token_hash`). Usar `"signup"`
+  aqui faz o Supabase recusar até o código certo, com `{"code":"otp_expired","message":"Token has
+  expired or is invalid"}` — a mesma mensagem genérica de "código errado", o que engana. `resend()`
+  continua com `type: "signup"` — é uma API diferente, com enum de `type` diferente, e ali
+  `"signup"` é o valor certo.
+- **Tamanho do código não é sempre 6**: "Number of characters used in the email OTP" é configurável
+  por projeto (Dashboard → Authentication → Providers → Email). Este projeto está em **8**, não no
+  padrão de 6 — testado direto na API (`/auth/v1/admin/generate_link` devolve o `email_otp` em
+  texto puro, útil pra depurar sem precisar ler e-mail nenhum). Com o campo travado em 6 caixas, o
+  app cortava os 2 últimos dígitos e caía exatamente no mesmo erro de "expirado". `TAMANHO_CODIGO`
+  em `confirmar-email.tsx` é a fonte da verdade no código — se o valor mudar no Dashboard, muda ali
+  também.
 
 Trava em dois níveis: `vaga/nova.tsx` bloqueia a publicação com uma tela de "complete seu cadastro"
 antes do formulário (reaproveitando o mesmo padrão visual do bloqueio "só contratante publica" que

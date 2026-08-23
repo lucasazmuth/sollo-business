@@ -10,9 +10,18 @@ import { colors, radius, space, type } from "@/src/theme/tokens";
 
 /**
  * Mostrada quando o projeto exige confirmação por e-mail: o signUp
- * criou a conta mas ainda não há sessão. Confirma por código de 6
- * dígitos (não link) — mesmo mecanismo pras duas personas.
+ * criou a conta mas ainda não há sessão. Confirma por código (não link) —
+ * mesmo mecanismo pras duas personas.
+ *
+ * TAMANHO_CODIGO precisa bater com "Number of characters used in the
+ * email OTP" no Auth do projeto Supabase (Dashboard → Authentication →
+ * Providers → Email). Testado direto na API: este projeto está com 8,
+ * não o padrão de 6 — usar 6 aqui faz o Supabase recusar até o código
+ * certo com "Token has expired or is invalid", porque o app manda só
+ * os 6 primeiros dígitos de um código de 8.
  */
+const TAMANHO_CODIGO = 8;
+
 export default function ConfirmarEmail() {
   const router = useRouter();
   const { email } = useLocalSearchParams<{ email?: string }>();
@@ -28,7 +37,7 @@ export default function ConfirmarEmail() {
   const emailNormalizado = email?.trim().toLowerCase();
 
   async function confirmar(valor: string) {
-    if (!emailNormalizado || valor.length !== 6) return;
+    if (!emailNormalizado || valor.length !== TAMANHO_CODIGO) return;
     setConfirmando(true);
     setErro(null);
 
@@ -75,17 +84,19 @@ export default function ConfirmarEmail() {
         </Text>
         <Text style={styles.title}>Confirme{"\n"}seu e-mail.</Text>
         <Text style={styles.lead}>
-          Mandamos um código de 6 dígitos para {emailNormalizado ?? "seu e-mail"}. Digite abaixo.
+          Mandamos um código de {TAMANHO_CODIGO} dígitos para {emailNormalizado ?? "seu e-mail"}.
+          Digite abaixo.
         </Text>
       </View>
 
       <View style={styles.corpo}>
         <PinInput
           valor={codigo}
+          tamanho={TAMANHO_CODIGO}
           onChange={(v) => {
             setCodigo(v);
             setErro(null);
-            if (v.length === 6) confirmar(v);
+            if (v.length === TAMANHO_CODIGO) confirmar(v);
           }}
           autoFocus
         />
@@ -116,7 +127,7 @@ export default function ConfirmarEmail() {
           label="Confirmar"
           onPress={() => confirmar(codigo)}
           loading={confirmando}
-          disabled={codigo.length !== 6}
+          disabled={codigo.length !== TAMANHO_CODIGO}
         />
         <Button label="Reenviar código" variant="ghost" loading={reenviando} onPress={reenviar} />
       </View>

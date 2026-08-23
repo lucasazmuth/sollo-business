@@ -42,9 +42,12 @@ export function PinInput({ valor, onChange, tamanho = 6, autoFocus }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { flexDirection: "row", gap: space.sm, position: "relative" },
+  // flex:1 nas caixas em vez de largura fixa — o código já variou de 6 pra
+  // 8 dígitos uma vez (o tamanho é configurável no projeto Supabase), então
+  // a largura precisa se ajustar sozinha em vez de estourar a tela.
+  wrap: { flexDirection: "row", gap: space.xs, position: "relative" },
   caixa: {
-    width: 48,
+    flex: 1,
     height: 56,
     borderRadius: radius.md,
     borderWidth: 1,
