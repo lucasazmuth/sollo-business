@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { gsap, useGSAP, prefersReduced } from "@/lib/gsap";
 import { SplitReveal, Fade } from "@/components/anim/Reveal";
 import { communities } from "@/content/site";
@@ -69,13 +68,10 @@ export function Communities() {
 
           <figure className="communities__figure">
             <div className="communities__photo-inner" ref={photo}>
-              <Image
-                src="/img/pro-smile.jpg"
-                alt="Profissional criativo sorrindo em retrato editorial"
-                fill
-                sizes="(max-width: 1024px) 100vw, 34vw"
-                className="communities__photo"
-              />
+              <div className="communities__blobs" aria-hidden>
+                <span className="blob communities__blob--1" />
+                <span className="blob communities__blob--2" />
+              </div>
             </div>
             <figcaption className="communities__caption">
               <span className="dot">●</span> Feito por gente do meio

@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { gsap, useGSAP, refreshSoon } from "@/lib/gsap";
 import { SplitReveal, Fade } from "@/components/anim/Reveal";
 import { MagneticLink } from "@/components/anim/Magnetic";
@@ -116,14 +115,11 @@ export function Connect() {
               </div>
 
               <figure className="connect__figure">
-                <Image
-                  src={t.image.src}
-                  alt={t.image.alt}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 42vw"
-                  className="connect__photo"
-                  priority={i === 0}
-                />
+                <div className="connect__blobs" aria-hidden>
+                  <span className="blob connect__blob--1" />
+                  <span className="blob connect__blob--2" />
+                  <span className="blob connect__blob--3" />
+                </div>
                 <span className="connect__figure-tint" aria-hidden />
               </figure>
             </div>

@@ -28,9 +28,6 @@ export const menuLinks = [
   { label: "FAQ", href: "#faq" }
 ];
 
-/* PLACEHOLDER: substituir pelos logos/nomes reais dos parceiros. */
-export const partners = ["Parceiro", "Parceiro", "Parceiro", "Parceiro", "Parceiro", "Parceiro"];
-
 export const steps = [
   {
     n: "01",
@@ -76,7 +73,7 @@ export const services = [
     n: "02",
     title: "Publicar anúncios",
     sub: "Publique e receba candidaturas",
-    text: "Crie e publique seus anúncios na Sollo Business, receba candidaturas, inicie conversas com possíveis parceiros e peça orçamentos de forma simplificada em um só lugar."
+    text: "Crie e publique sua vaga na Sollo Business e receba candidaturas de profissionais dentro do raio que você definir — quanto mais urgente, mais rápido a notificação chega perto de você."
   },
   {
     n: "03",
@@ -86,21 +83,9 @@ export const services = [
   },
   {
     n: "04",
-    title: "Orçamentos personalizados",
-    sub: "Sem burocracia",
-    text: "Com o nosso sistema, você pode criar orçamentos detalhados com praticidade. Basta adicionar itens ao carrinho, incluindo título, descrição, valor e margem de lucro. E o melhor de tudo: você pode enviar tudo diretamente pelo chat, sem burocracia! Além disso, todos os orçamentos têm um status que pode ser facilmente editado."
-  },
-  {
-    n: "05",
-    title: "Gestão de projetos e equipes",
-    sub: "Times e entregas",
-    text: "Organize seu time e acompanhe o progresso de cada serviço solicitado. Você também pode vincular anúncios de vagas a projetos específicos, como eventos ou filmes, para garantir a máxima eficiência dos resultados."
-  },
-  {
-    n: "06",
-    title: "Drive",
-    sub: "Tudo no mesmo lugar",
-    text: "No chat você terá todos os arquivos enviados, organizados e acessíveis pela aba “Arquivos”. Dessa forma, você pode baixá-los a qualquer momento, mantendo tudo no mesmo lugar e fácil de gerenciar."
+    title: "Avaliações",
+    sub: "Reputação que conta",
+    text: "Depois de cada trabalho, contratante e profissional se avaliam mutuamente. É essa nota que constrói a reputação de cada um dentro da plataforma e ajuda a decidir a próxima contratação."
   }
 ];
 
@@ -115,8 +100,7 @@ export const connectTabs = [
       { n: "0", l: "custo por anúncio" },
       { n: "km", l: "busca por raio de urgência" }
     ],
-    cta: { label: "Publicar uma vaga", variant: "magenta" as const },
-    image: { src: "/img/pro-coat.jpg", alt: "Profissional do audiovisual em retrato de estúdio" }
+    cta: { label: "Publicar uma vaga", variant: "magenta" as const }
   },
   {
     id: "profissionais",
@@ -128,8 +112,7 @@ export const connectTabs = [
       { n: "2x", l: "avaliação em duas vias" },
       { n: "24/7", l: "suporte por tickets" }
     ],
-    cta: { label: "Criar meu perfil", variant: "lime" as const },
-    image: { src: "/img/pro-flowers.jpg", alt: "Artista em retrato editorial com flores" }
+    cta: { label: "Criar meu perfil", variant: "lime" as const }
   }
 ];
 
@@ -172,43 +155,6 @@ export const plans = [
   }
 ];
 
-/* PLACEHOLDER: depoimentos vindos da copy de referência (citam a marca "Sanny").
-   Substituir por depoimentos reais de clientes Sollo Business antes de publicar. */
-export const quotes = [
-  {
-    text: "The Sanny team has changed our internal productivity for the better. We use automation for everything from childcare to ordering food for lunches.",
-    name: "Melissa Lewis",
-    role: "CEO of Kinder Bench",
-    accent: false
-  },
-  {
-    text: "This is the 3rd AI automation agency to create SMM bots for us. And this time, we were not mistaken in our choice.",
-    name: "Jake Jake",
-    role: "CDO of Goodnight SMM",
-    accent: false
-  },
-  {
-    text: "“We came to Sanny AI agency with just an idea on a piece of paper. But now we have an incredible product that has exceeded all possible expectations. And the 50 billion investment round is only proof of this.”",
-    name: "Bruce Ng",
-    role: "Co-founder and CEO of SPICE AI",
-    accent: true
-  },
-  {
-    text: "According to our observations, the bakery started saving about 33 working days per quarter thanks to comprehensive automation from Sanny AI agency.",
-    name: "Vincent Kapoor",
-    role: "Founder of La Boulangerie™",
-    accent: false
-  }
-];
-
-/* PLACEHOLDER: trocar nomes, cargos e fotos reais da equipe. */
-export const team = [
-  { name: "Nome Sobrenome", role: "Cargo" },
-  { name: "Nome Sobrenome", role: "Cargo" },
-  { name: "Nome Sobrenome", role: "Cargo" },
-  { name: "Nome Sobrenome", role: "Cargo" }
-];
-
 /* PLACEHOLDER: respostas redigidas a partir das informações da copy — validar com o time. */
 export const faq = [
   {
@@ -239,15 +185,14 @@ export const footerGroups = [
     links: [
       { label: "Como funciona", href: "#como-funciona" },
       { label: "Serviços", href: "#servicos" },
-      { label: "Comissão", href: "#comissao" }
+      { label: "Planos", href: "#comissao" }
     ]
   },
   {
     title: "Comunidade",
     links: [
       { label: "Comunidades", href: "#comunidades" },
-      { label: "Conecte-se", href: "#conecte-se" },
-      { label: "Equipe", href: "#equipe" }
+      { label: "Conecte-se", href: "#conecte-se" }
     ]
   },
   {

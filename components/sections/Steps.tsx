@@ -88,7 +88,7 @@ export function Steps() {
           </SplitReveal>
         </div>
         <Fade as="p" className="lead" style={{ maxWidth: "38ch" }}>
-          Do primeiro orçamento à liberação do pagamento: cada etapa acontece dentro da plataforma.
+          Do primeiro contato à avaliação final: cada etapa acontece dentro da plataforma.
         </Fade>
       </div>
 
