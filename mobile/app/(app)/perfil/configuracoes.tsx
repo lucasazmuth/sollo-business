@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Screen } from "@/src/components/Screen";
+import { avisar, confirmar } from "@/src/lib/dialogo";
 import { excluirConta } from "@/src/lib/auth";
 import { useSession } from "@/src/lib/session";
 import { LINKS } from "@/src/lib/links";
@@ -15,15 +16,15 @@ export default function Configuracoes() {
   const { signOut } = useSession();
   const [excluindo, setExcluindo] = useState(false);
 
-  function confirmarExclusao() {
-    Alert.alert(
-      "Excluir conta",
-      "Isso apaga permanentemente seu perfil, vagas, candidaturas, conversas e avaliações. Não é possível desfazer.",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Excluir conta", style: "destructive", onPress: excluir }
-      ]
-    );
+  async function confirmarExclusao() {
+    const ok = await confirmar({
+      titulo: "Excluir conta",
+      mensagem:
+        "Isso apaga permanentemente seu perfil, vagas, candidaturas, conversas e avaliações. Não é possível desfazer.",
+      confirmar: "Excluir conta",
+      destrutivo: true
+    });
+    if (ok) excluir();
   }
 
   // `openURL` rejeita quando não há app capaz de abrir o esquema (aparelho
@@ -33,7 +34,7 @@ export default function Configuracoes() {
     try {
       await Linking.openURL(url);
     } catch {
-      Alert.alert("Não deu para abrir", url);
+      avisar("Não deu para abrir", url);
     }
   }
 
@@ -44,7 +45,7 @@ export default function Configuracoes() {
       router.replace("/(auth)/welcome");
     } catch (erro) {
       setExcluindo(false);
-      Alert.alert("Não foi possível excluir", erro instanceof Error ? erro.message : "Tente de novo.");
+      avisar("Não foi possível excluir", erro instanceof Error ? erro.message : "Tente de novo.");
     }
   }
 

@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useFocusEffect, useRouter } from "expo-router";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
+import { avisar } from "@/src/lib/dialogo";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { Chip } from "@/src/components/Chip";
@@ -88,7 +89,7 @@ export default function NovaVaga() {
       setEnviandoCapa(true);
       setCoverUrl(await enviarImagem("jobs", asset, userId));
     } catch (e) {
-      Alert.alert("Não deu", e instanceof MediaError ? e.message : "Falha ao enviar a imagem.");
+      avisar("Não deu", e instanceof MediaError ? e.message : "Falha ao enviar a imagem.");
     } finally {
       setEnviandoCapa(false);
     }

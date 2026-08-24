@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Screen } from "@/src/components/Screen";
+import { avisar } from "@/src/lib/dialogo";
 import { Button } from "@/src/components/Button";
 import { StarRating } from "@/src/components/StarRating";
 import { useSession } from "@/src/lib/session";
@@ -36,11 +37,13 @@ export default function Avaliar() {
     setEnviando(true);
     try {
       await enviarAvaliacao({ jobId, raterId: meuId, ratedId, nota, comentario });
-      Alert.alert("Avaliação enviada", "Obrigado, isso ajuda toda a comunidade.", [
-        { text: "OK", onPress: () => router.back() }
-      ]);
+      // Volta sozinho depois do aviso: depender do onPress do botão do
+      // Alert deixava a pessoa parada na tela no web, onde o diálogo é um
+      // `window.alert` sem callback.
+      avisar("Avaliação enviada", "Obrigado, isso ajuda toda a comunidade.");
+      router.back();
     } catch (e) {
-      Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao enviar a avaliação.");
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao enviar a avaliação.");
     } finally {
       setEnviando(false);
     }

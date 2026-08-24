@@ -1,9 +1,10 @@
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
+import { avisar, confirmar } from "@/src/lib/dialogo";
 import { Button } from "@/src/components/Button";
 import { Avatar } from "@/src/components/Avatar";
 import { DestacarVagaModal } from "@/src/components/DestacarVagaModal";
@@ -73,43 +74,43 @@ export default function DetalheVaga() {
       const nova = await candidatar(vaga.id, userId);
       setCandidatura(nova);
     } catch (e) {
-      Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao se candidatar.");
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao se candidatar.");
     } finally {
       setEnviando(false);
     }
   }
 
-  function confirmarRetirada() {
+  async function confirmarRetirada() {
     if (!candidatura) return;
-    Alert.alert("Retirar candidatura?", "O contratante deixa de ver seu perfil nesta vaga.", [
-      { text: "Voltar", style: "cancel" },
-      {
-        text: "Retirar",
-        style: "destructive",
-        onPress: async () => {
-          await retirarCandidatura(candidatura.id);
-          setCandidatura({ ...candidatura, status: "retirada" });
-        }
-      }
-    ]);
+    const ok = await confirmar({
+      titulo: "Retirar candidatura?",
+      mensagem: "O contratante deixa de ver seu perfil nesta vaga.",
+      confirmar: "Retirar",
+      cancelar: "Voltar",
+      destrutivo: true
+    });
+    if (!ok) return;
+
+    await retirarCandidatura(candidatura.id);
+    setCandidatura({ ...candidatura, status: "retirada" });
   }
 
-  function confirmarCancelamento() {
-    Alert.alert("Cancelar a vaga?", "Todos os candidatos serão avisados. Isso não pode ser desfeito.", [
-      { text: "Voltar", style: "cancel" },
-      {
-        text: "Cancelar vaga",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await cancelarVaga(vaga!.id);
-            router.back();
-          } catch (e) {
-            Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao cancelar.");
-          }
-        }
-      }
-    ]);
+  async function confirmarCancelamento() {
+    const ok = await confirmar({
+      titulo: "Cancelar a vaga?",
+      mensagem: "Todos os candidatos serão avisados. Isso não pode ser desfeito.",
+      confirmar: "Cancelar vaga",
+      cancelar: "Voltar",
+      destrutivo: true
+    });
+    if (!ok) return;
+
+    try {
+      await cancelarVaga(vaga!.id);
+      router.back();
+    } catch (e) {
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao cancelar.");
+    }
   }
 
   if (carregando) {

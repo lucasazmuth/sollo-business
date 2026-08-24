@@ -34,6 +34,8 @@ export default function PreferenciasNotificacao() {
     registrarParaPush(userId).then((r) => {
       if (!vivo) return;
       if (r.ok) setStatusPush("Este aparelho está registrado para receber push.");
+      else if (r.motivo === "web")
+        setStatusPush("No navegador não há push. Instale o app para receber aviso de vaga.");
       else if (r.motivo === "expo-go")
         setStatusPush("No Expo Go o push remoto não funciona: precisa de um development build.");
       else if (r.motivo === "simulador")

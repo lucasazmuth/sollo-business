@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Screen } from "@/src/components/Screen";
+import { avisar } from "@/src/lib/dialogo";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { useSession } from "@/src/lib/session";
@@ -112,7 +113,7 @@ export default function CompletarCadastro() {
       await refreshProfile();
       router.back();
     } catch (e) {
-      Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao salvar.");
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao salvar.");
     } finally {
       setSalvando(false);
     }

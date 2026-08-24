@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
+import { avisar, confirmar } from "@/src/lib/dialogo";
 import { Avatar } from "@/src/components/Avatar";
 import {
   candidatosDaVaga,
@@ -49,28 +50,24 @@ export default function Candidatos() {
     }, [carregar])
   );
 
-  function confirmarSelecao(c: Candidato) {
-    Alert.alert(
-      `Escolher ${c.profiles?.nome ?? "este candidato"}?`,
-      "A vaga é fechada e os demais candidatos são avisados automaticamente.",
-      [
-        { text: "Voltar", style: "cancel" },
-        {
-          text: "Escolher",
-          onPress: async () => {
-            setAgindo(c.id);
-            try {
-              await selecionarCandidato(c.id);
-              await carregar();
-            } catch (e) {
-              Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao selecionar.");
-            } finally {
-              setAgindo(null);
-            }
-          }
-        }
-      ]
-    );
+  async function confirmarSelecao(c: Candidato) {
+    const ok = await confirmar({
+      titulo: `Escolher ${c.profiles?.nome ?? "este candidato"}?`,
+      mensagem: "A vaga é fechada e os demais candidatos são avisados automaticamente.",
+      confirmar: "Escolher",
+      cancelar: "Voltar"
+    });
+    if (!ok) return;
+
+    setAgindo(c.id);
+    try {
+      await selecionarCandidato(c.id);
+      await carregar();
+    } catch (e) {
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao selecionar.");
+    } finally {
+      setAgindo(null);
+    }
   }
 
   // A conversa nasce daqui, de um toque do contratante — não mais de um
@@ -82,7 +79,7 @@ export default function Candidatos() {
       const conversaId = await abrirConversa(id, c.professional_id);
       router.push(`/(app)/conversa/${conversaId}`);
     } catch (e) {
-      Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao abrir a conversa.");
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao abrir a conversa.");
     } finally {
       setAgindo(null);
     }
@@ -94,7 +91,7 @@ export default function Candidatos() {
       await recusarCandidato(c.id);
       await carregar();
     } catch (e) {
-      Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao recusar.");
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao recusar.");
     } finally {
       setAgindo(null);
     }

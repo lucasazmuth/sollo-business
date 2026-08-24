@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
+import { avisar } from "@/src/lib/dialogo";
 import { Button } from "@/src/components/Button";
 import { useSession } from "@/src/lib/session";
 import { buscarPerfil, salvarLocalizacao, salvarPerfilProfissional } from "@/src/api/profile";
@@ -52,7 +53,7 @@ export default function Localizacao() {
     try {
       const { granted } = await Location.requestForegroundPermissionsAsync();
       if (!granted) {
-        Alert.alert(
+        avisar(
           "Sem acesso à localização",
           "Sem isso não conseguimos avisar de vagas perto de você. Você pode liberar em Ajustes."
         );
@@ -78,7 +79,7 @@ export default function Localizacao() {
       setCoord({ lat: pos.coords.latitude, lng: pos.coords.longitude });
       setLabel(texto);
     } catch {
-      Alert.alert("Não deu", "Não conseguimos obter sua localização agora.");
+      avisar("Não deu", "Não conseguimos obter sua localização agora.");
     } finally {
       setBuscandoGps(false);
     }
@@ -95,7 +96,7 @@ export default function Localizacao() {
       }
       router.back();
     } catch (e) {
-      Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao salvar.");
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao salvar.");
     } finally {
       setSalvando(false);
     }

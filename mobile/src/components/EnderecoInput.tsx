@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import * as Location from "expo-location";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { colors, radius, space, type } from "@/src/theme/tokens";
@@ -28,13 +28,24 @@ type Props = {
  *
  * Diferente da base do profissional, a coordenada da vaga NÃO é arredondada:
  * é endereço de trabalho, e o candidato precisa saber exatamente onde é.
+ *
+ * No navegador o `geocodeAsync` não existe (o expo-location só implementa
+ * o geocoder nas plataformas nativas). Lá sobra "usar minha localização
+ * atual", que roda pela API de geolocalização do próprio navegador — e o
+ * campo diz isso em vez de fingir que a busca falhou.
  */
+const BUSCA_POR_TEXTO = Platform.OS !== "web";
 export function EnderecoInput({ valor, onChange, erro }: Props) {
   const [texto, setTexto] = useState(valor?.endereco ?? "");
   const [buscando, setBuscando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
 
   async function buscarPorTexto() {
+    if (!BUSCA_POR_TEXTO) {
+      setAviso("No navegador, use “minha localização atual”. Buscar por endereço só no app.");
+      return;
+    }
+
     const consulta = texto.trim();
     if (consulta.length < 5) {
       setAviso("Escreva o endereço com rua, número e cidade.");
@@ -128,11 +139,11 @@ export function EnderecoInput({ valor, onChange, erro }: Props) {
 
         {buscando ? (
           <ActivityIndicator color={colors.magenta} size="small" />
-        ) : (
+        ) : BUSCA_POR_TEXTO ? (
           <Pressable onPress={buscarPorTexto} hitSlop={10}>
             <Text style={styles.acao}>BUSCAR</Text>
           </Pressable>
-        )}
+        ) : null}
       </View>
 
       <Pressable onPress={usarLocalAtual} hitSlop={8}>

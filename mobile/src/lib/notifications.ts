@@ -12,20 +12,37 @@ import { supabase } from "@/src/lib/supabase";
  * falhar silenciosamente e parecer que o registro deu certo.
  */
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true
-  })
-});
+/**
+ * O módulo nativo não existe no navegador: chamar qualquer coisa dele lá
+ * derruba a tela com "not available on web". O app roda também em
+ * app.sollo.business, então toda entrada daqui precisa passar por esta
+ * porta antes de tocar no `Notifications`.
+ */
+export const PUSH_SUPORTADO = Platform.OS !== "web";
+
+if (PUSH_SUPORTADO) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true
+    })
+  });
+}
 
 export type ResultadoRegistro =
   | { ok: true; token: string }
-  | { ok: false; motivo: "expo-go" | "simulador" | "permissao-negada" | "erro"; detalhe?: string };
+  | {
+      ok: false;
+      motivo: "web" | "expo-go" | "simulador" | "permissao-negada" | "erro";
+      detalhe?: string;
+    };
 
 export async function registrarParaPush(profileId: string): Promise<ResultadoRegistro> {
+  if (!PUSH_SUPORTADO) {
+    return { ok: false, motivo: "web" };
+  }
   if (Constants.appOwnership === "expo") {
     return { ok: false, motivo: "expo-go" };
   }
@@ -77,7 +94,7 @@ export async function registrarParaPush(profileId: string): Promise<ResultadoReg
 /** Some com o token deste aparelho — chamado no logout. */
 export async function desregistrarPush() {
   try {
-    if (Constants.appOwnership === "expo" || !Device.isDevice) return;
+    if (!PUSH_SUPORTADO || Constants.appOwnership === "expo" || !Device.isDevice) return;
     const { data: token } = await Notifications.getExpoPushTokenAsync();
     await supabase.from("device_tokens").delete().eq("expo_token", token);
   } catch {

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   StyleSheet,
   Switch,
@@ -12,6 +11,7 @@ import {
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Screen } from "@/src/components/Screen";
+import { avisar, confirmar } from "@/src/lib/dialogo";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { Avatar } from "@/src/components/Avatar";
@@ -101,7 +101,7 @@ export default function EditarPerfil() {
       // Só apaga a antiga depois que a nova está gravada.
       if (anterior) await removerImagem("avatars", anterior).catch(() => {});
     } catch (e) {
-      Alert.alert("Não deu", e instanceof MediaError ? e.message : "Falha ao enviar a imagem.");
+      avisar("Não deu", e instanceof MediaError ? e.message : "Falha ao enviar a imagem.");
     } finally {
       setEnviandoAvatar(false);
     }
@@ -118,7 +118,7 @@ export default function EditarPerfil() {
       const item = await adicionarAoPortfolio(userId, url, portfolio.length);
       setPortfolio((atual) => [...atual, item]);
     } catch (e) {
-      Alert.alert("Não deu", e instanceof MediaError ? e.message : "Falha ao enviar a imagem.");
+      avisar("Não deu", e instanceof MediaError ? e.message : "Falha ao enviar a imagem.");
     } finally {
       setEnviandoItem(false);
     }
@@ -131,18 +131,17 @@ export default function EditarPerfil() {
   }, [secao, carregando, adicionarItem]);
 
   const removerItem = useCallback((item: PortfolioItem) => {
-    Alert.alert("Remover do portfólio?", "A imagem sai do seu perfil.", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Remover",
-        style: "destructive",
-        onPress: async () => {
-          await removerDoPortfolio(item.id);
-          await removerImagem("portfolio", item.media_url).catch(() => {});
-          setPortfolio((atual) => atual.filter((i) => i.id !== item.id));
-        }
-      }
-    ]);
+    confirmar({
+      titulo: "Remover do portfólio?",
+      mensagem: "A imagem sai do seu perfil.",
+      confirmar: "Remover",
+      destrutivo: true
+    }).then(async (ok) => {
+      if (!ok) return;
+      await removerDoPortfolio(item.id);
+      await removerImagem("portfolio", item.media_url).catch(() => {});
+      setPortfolio((atual) => atual.filter((i) => i.id !== item.id));
+    });
   }, []);
 
   async function salvar() {
@@ -164,7 +163,7 @@ export default function EditarPerfil() {
       await refreshProfile();
       router.back();
     } catch (e) {
-      Alert.alert("Não deu", e instanceof Error ? e.message : "Falha ao salvar.");
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao salvar.");
     } finally {
       setSalvando(false);
     }
