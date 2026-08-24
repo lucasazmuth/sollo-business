@@ -9,7 +9,7 @@ import { IconEnviado, IconEstrela, IconMais, IconMapa, IconVagas } from "@/src/c
 import { useSession } from "@/src/lib/session";
 import { minhasVagas } from "@/src/api/jobs";
 import { buscarFeed, contarNoRaio } from "@/src/api/feed";
-import { idsDasVagasQueAplicei } from "@/src/api/applications";
+import { minhasCandidaturas } from "@/src/api/applications";
 import { avaliacoesPendentes } from "@/src/api/ratings";
 import { buscarPerfil } from "@/src/api/profile";
 import { useEhDesktop } from "@/src/lib/layout";
@@ -20,8 +20,10 @@ type Resumo = {
   principal: number | null;
   /** Profissional: urgentes no raio. Contratante: candidatos esperando. */
   urgentes: number | null;
+  /** Quantas candidaturas enviei / quantos candidatos recebi. */
   secundario: number | null;
-  terciario: number | null;
+  /** Trabalhos que já aconteceram: a métrica que constrói reputação. */
+  realizados: number | null;
   pendentes: number;
   /** Raio configurado, para a descrição do cartão. */
   raioKm: number | null;
@@ -31,7 +33,7 @@ const VAZIO: Resumo = {
   principal: null,
   urgentes: null,
   secundario: null,
-  terciario: null,
+  realizados: null,
   pendentes: 0,
   raioKm: null
 };
@@ -57,6 +59,8 @@ export default function Home() {
       // Cada persona olha para um conjunto diferente de números, mas o
       // formato do resumo é o mesmo — é o que deixa a tela ter uma
       // estrutura só, com dois conteúdos.
+      const agora = Date.now();
+
       async function carregaContratante(userId: string) {
         const vagas = await minhasVagas(userId);
         const abertas = vagas.filter((v) => v.status === "aberta");
@@ -65,7 +69,11 @@ export default function Home() {
           principal: abertas.length,
           urgentes: abertas.filter((v) => v.is_urgent).length,
           secundario: candidatos,
-          terciario: vagas.filter((v) => v.status === "preenchida").length,
+          // Preenchida e com a data já passada: contratar não é a mesma
+          // coisa que o trabalho ter acontecido.
+          realizados: vagas.filter(
+            (v) => v.status === "preenchida" && new Date(v.starts_at).getTime() < agora
+          ).length,
           raioKm: null
         };
       }
@@ -77,17 +85,24 @@ export default function Home() {
         // para configurar em vez de exibir um zero sem explicação.
         const temBase = !!perfil?.professional?.base_definida;
 
-        const [noRaio, urgentes, aplicadas] = await Promise.all([
+        const [noRaio, urgentes, candidaturas] = await Promise.all([
           temBase ? contarNoRaio(raio) : Promise.resolve(0),
           temBase ? buscarFeed({ apenasUrgentes: true }) : Promise.resolve([]),
-          idsDasVagasQueAplicei(userId)
+          minhasCandidaturas(userId)
         ]);
 
         return {
           principal: temBase ? noRaio : -1,
           urgentes: urgentes.length,
-          secundario: aplicadas.size,
-          terciario: perfil?.portfolio.length ?? 0,
+          // Retirada não conta como tentativa: a pessoa desistiu.
+          secundario: candidaturas.filter((c) => c.status !== "retirada").length,
+          // Selecionado e com a data já passada — o job de fato aconteceu.
+          realizados: candidaturas.filter(
+            (c) =>
+              c.status === "selecionada" &&
+              !!c.jobs &&
+              new Date(c.jobs.starts_at).getTime() < agora
+          ).length,
           raioKm: temBase ? raio : null
         };
       }
@@ -174,7 +189,7 @@ export default function Home() {
       <Animated.View entering={FadeInDown.delay(160).duration(500)} style={styles.numeros}>
         <CardNumero
           valor={r.secundario}
-          rotulo={ehContratante ? "candidatos" : "candidaturas"}
+          rotulo={ehContratante ? "candidatos recebidos" : "aplicados"}
           onPress={
             ehContratante
               ? () => router.push("/(app)/(tabs)/vagas")
@@ -182,12 +197,12 @@ export default function Home() {
           }
         />
         <CardNumero
-          valor={r.terciario}
-          rotulo={ehContratante ? "preenchidas" : "no portfólio"}
+          valor={r.realizados}
+          rotulo="realizados"
           onPress={
             ehContratante
               ? () => router.push("/(app)/(tabs)/vagas")
-              : () => router.push("/(app)/perfil/editar?secao=portfolio")
+              : () => router.push("/(app)/avaliacoes")
           }
         />
       </Animated.View>
