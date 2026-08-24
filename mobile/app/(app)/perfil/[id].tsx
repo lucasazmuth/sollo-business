@@ -105,7 +105,7 @@ export default function PerfilPublico() {
           valor={String(professional?.rating_count ?? hirer?.rating_count ?? 0)}
           rotulo="trabalhos"
         />
-        {ehProfissional && <Metric valor={String(portfolio.length)} rotulo="no portfólio" />}
+        {ehProfissional && <Metric valor={String(portfolio.length)} rotulo="imagens" />}
       </View>
 
       {!!profile.bio && <Text style={styles.bio}>{profile.bio}</Text>}
@@ -121,7 +121,7 @@ export default function PerfilPublico() {
 
       {ehProfissional && portfolio.length > 0 && (
         <View style={styles.secao}>
-          <Text style={styles.secaoTitulo}>Portfólio</Text>
+          <Text style={styles.secaoTitulo}>Imagens</Text>
           <View style={[styles.grade, { gap }]}>
             {portfolio.map((item, i) => {
               const lado = i === 0 ? celula * 2 + gap : celula;

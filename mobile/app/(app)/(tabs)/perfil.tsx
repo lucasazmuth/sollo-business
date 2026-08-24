@@ -156,7 +156,7 @@ export default function MeuPerfil() {
           valor={String(professional?.rating_count ?? hirer?.rating_count ?? 0)}
           rotulo="trabalhos"
         />
-        {ehProfissional && <Metric valor={String(portfolio.length)} rotulo="no portfólio" />}
+        {ehProfissional && <Metric valor={String(portfolio.length)} rotulo="imagens" />}
       </View>
 
       {!!profile.bio && <Text style={styles.bio}>{profile.bio}</Text>}
@@ -185,19 +185,20 @@ export default function MeuPerfil() {
 
       {ehProfissional && (
         <View style={styles.secaoPortfolio}>
-          <Text style={styles.secaoTitulo}>Portfólio</Text>
+          <Text style={styles.secaoTitulo}>Imagens</Text>
 
           {/* O card vazio era só texto e um toque sem pista nenhuma: para
               subir trabalho a pessoa tinha que adivinhar que o caminho era
               "Editar perfil". O (+) e o botão dizem para onde ir. */}
           {portfolio.length === 0 ? (
             <Pressable style={styles.vazio} onPress={irParaPortfolio}>
-              <Text style={styles.vazioTitulo}>Seu portfólio está vazio</Text>
+              <Text style={styles.vazioTitulo}>Nenhuma imagem ainda</Text>
               <Text style={styles.vazioTexto}>
-                É por aqui que o contratante decide. Suba pelo menos três trabalhos.
+                É por aqui que o contratante decide. Suba pelo menos três fotos do seu
+                trabalho.
               </Text>
               <View style={styles.vazioBotao}>
-                <Text style={styles.vazioBotaoTexto}>ADICIONAR TRABALHOS</Text>
+                <Text style={styles.vazioBotaoTexto}>ADICIONAR IMAGENS</Text>
               </View>
             </Pressable>
           ) : (
@@ -217,13 +218,13 @@ export default function MeuPerfil() {
                 );
               })}
 
-              {/* Mesmo com portfólio cheio faltava por onde acrescentar sem
+              {/* Mesmo com a grade cheia faltava por onde acrescentar sem
                   passar por "Editar perfil". */}
               <Pressable
                 style={[styles.adicionar, { width: celula, height: celula }]}
                 onPress={irParaPortfolio}
                 accessibilityRole="button"
-                accessibilityLabel="Adicionar trabalho ao portfólio"
+                accessibilityLabel="Adicionar imagem"
               >
                 <Text style={styles.adicionarSinal}>+</Text>
               </Pressable>

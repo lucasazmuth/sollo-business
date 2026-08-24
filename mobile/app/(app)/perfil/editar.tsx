@@ -132,7 +132,7 @@ export default function EditarPerfil() {
 
   const removerItem = useCallback((item: PortfolioItem) => {
     confirmar({
-      titulo: "Remover do portfólio?",
+      titulo: "Remover esta imagem?",
       mensagem: "A imagem sai do seu perfil.",
       confirmar: "Remover",
       destrutivo: true
@@ -263,7 +263,7 @@ export default function EditarPerfil() {
           </View>
 
           <View style={styles.secao}>
-            <Text style={styles.rotulo}>PORTFÓLIO</Text>
+            <Text style={styles.rotulo}>IMAGENS</Text>
             <Text style={styles.ajuda}>Toque e segure para remover.</Text>
 
             <View style={styles.grade}>

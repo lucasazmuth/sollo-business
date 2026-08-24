@@ -32,7 +32,7 @@ const SLIDES = [
     tom: colors.magenta,
     titulo: "Seu trabalho é\na sua candidatura.",
     texto:
-      "O perfil já conta sua história: portfólio, categorias e onde você atua. Candidatar é um toque, sem formulário nenhum."
+      "O perfil já conta sua história: suas imagens, categorias e onde você atua. Candidatar é um toque, sem formulário nenhum."
   },
   {
     fonte: ILUSTRA.check,
