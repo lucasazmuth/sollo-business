@@ -22,6 +22,9 @@ type Props = {
    * Marca no canto esquerdo do topo. Usada nas telas raiz das abas, que não
    * têm botão voltar — sem ela o app inteiro fica sem assinatura visual.
    * Em tela empurrada o lugar é do botão voltar, então `back` tem prioridade.
+   *
+   * Em desktop é ignorada: o rail lateral já carrega a marca, e as duas
+   * juntas apareciam lado a lado, a poucos centímetros uma da outra.
    */
   logo?: boolean;
   /** Ação no canto direito da fileira do topo (ex.: sininho de notificações). */
@@ -52,6 +55,7 @@ export function Screen({
 }: Props) {
   const router = useRouter();
   const desktop = useEhDesktop();
+  const mostraLogo = logo && !desktop;
 
   const body = (
     <View
@@ -72,7 +76,7 @@ export function Screen({
     <SafeAreaView style={styles.root} edges={["top", "bottom"]}>
       {/* No fluxo, não absoluto: como irmão do KeyboardAvoidingView (flex:1)
           o botão ficava coberto por ele e os toques não chegavam. */}
-      {(back || logo || right) && (
+      {(back || mostraLogo || right) && (
         <View style={[styles.barraVoltar, desktop && styles.barraDesktop]}>
           {back ? (
             <Pressable
@@ -84,7 +88,7 @@ export function Screen({
             >
               <Text style={styles.backIcon}>←</Text>
             </Pressable>
-          ) : logo ? (
+          ) : mostraLogo ? (
             <View style={styles.marca}>
               <Wordmark width={78} />
             </View>
