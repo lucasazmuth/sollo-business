@@ -636,6 +636,7 @@ export type Database = {
           links: Json
           profile_id: string
           raio_km: number
+          site: string | null
           rating_avg: number | null
           rating_count: number
           updated_at: string
@@ -650,6 +651,7 @@ export type Database = {
           links?: Json
           profile_id: string
           raio_km?: number
+          site?: string | null
           rating_avg?: number | null
           rating_count?: number
           updated_at?: string
@@ -664,6 +666,7 @@ export type Database = {
           links?: Json
           profile_id?: string
           raio_km?: number
+          site?: string | null
           rating_avg?: number | null
           rating_count?: number
           updated_at?: string

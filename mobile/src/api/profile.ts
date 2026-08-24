@@ -62,7 +62,9 @@ export async function salvarPerfil(
 
 export async function salvarPerfilProfissional(
   profileId: string,
-  campos: Partial<Pick<ProfessionalProfile, "headline" | "categorias" | "disponivel" | "raio_km" | "links">>
+  campos: Partial<
+    Pick<ProfessionalProfile, "headline" | "categorias" | "disponivel" | "raio_km" | "site">
+  >
 ) {
   await comRetry(async () => {
     const { error } = await supabase

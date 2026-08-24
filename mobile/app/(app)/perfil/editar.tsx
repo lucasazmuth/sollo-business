@@ -18,6 +18,7 @@ import { Avatar } from "@/src/components/Avatar";
 import { Chip } from "@/src/components/Chip";
 import { useSession } from "@/src/lib/session";
 import { escolherImagem, enviarImagem, removerImagem, MediaError } from "@/src/lib/media";
+import { normalizarUrl, urlValida } from "@/src/lib/url";
 import {
   adicionarAoPortfolio,
   buscarPerfil,
@@ -54,6 +55,10 @@ export default function EditarPerfil() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [headline, setHeadline] = useState("");
   const [empresa, setEmpresa] = useState("");
+  // Um campo só, compartilhado pelas duas personas: é o mesmo conceito, e
+  // desde a migration de hoje é a mesma coluna `site` nas duas tabelas.
+  const [site, setSite] = useState("");
+  const [erroSite, setErroSite] = useState<string | null>(null);
   const [disponivel, setDisponivel] = useState(true);
   const [selecionadas, setSelecionadas] = useState<string[]>([]);
   const [categorias, setCategorias] = useState<Category[]>([]);
@@ -72,6 +77,7 @@ export default function EditarPerfil() {
         setAvatarUrl(p.profile.avatar_url);
         setHeadline(p.professional?.headline ?? "");
         setEmpresa(p.hirer?.empresa ?? "");
+        setSite(p.professional?.site ?? p.hirer?.site ?? "");
         setDisponivel(p.professional?.disponivel ?? true);
         setSelecionadas(p.professional?.categorias ?? []);
         setPortfolio(p.portfolio);
@@ -146,6 +152,14 @@ export default function EditarPerfil() {
 
   async function salvar() {
     if (!userId) return;
+
+    if (!urlValida(site)) {
+      setErroSite("Esse link não parece válido. Ex.: instagram.com/seu-perfil");
+      return;
+    }
+    setErroSite(null);
+    const siteNormalizado = normalizarUrl(site);
+
     setSalvando(true);
     try {
       await salvarPerfil(userId, { nome: nome.trim(), bio: bio.trim() || null });
@@ -154,10 +168,14 @@ export default function EditarPerfil() {
         await salvarPerfilProfissional(userId, {
           headline: headline.trim() || null,
           categorias: selecionadas,
-          disponivel
+          disponivel,
+          site: siteNormalizado
         });
       } else {
-        await salvarPerfilContratante(userId, { empresa: empresa.trim() || null });
+        await salvarPerfilContratante(userId, {
+          empresa: empresa.trim() || null,
+          site: siteNormalizado
+        });
       }
 
       await refreshProfile();
@@ -222,6 +240,27 @@ export default function EditarPerfil() {
           style={{ minHeight: 96, textAlignVertical: "top" }}
           maxLength={280}
         />
+
+        <Input
+          label="Link"
+          value={site}
+          onChangeText={(t) => {
+            setSite(t);
+            if (erroSite) setErroSite(null);
+          }}
+          placeholder={
+            ehProfissional ? "instagram.com/seu-perfil" : "site da sua produtora"
+          }
+          keyboardType="url"
+          autoCapitalize="none"
+          autoCorrect={false}
+          error={erroSite ?? undefined}
+        />
+        <Text style={styles.ajuda}>
+          {ehProfissional
+            ? "Reel, Behance, Instagram: o lugar onde seu trabalho está inteiro."
+            : "Onde o profissional pode conhecer melhor quem está contratando."}
+        </Text>
       </View>
 
       {ehProfissional && (

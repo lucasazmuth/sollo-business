@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Image } from "expo-image";
 import { useFocusEffect, useRouter } from "expo-router";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -11,6 +11,8 @@ import { SettingsButton } from "@/src/components/SettingsButton";
 import { HeaderAcoes } from "@/src/components/HeaderAcoes";
 import { useSession } from "@/src/lib/session";
 import { buscarPerfil, listarCategorias, type PerfilCompleto, type Category } from "@/src/api/profile";
+import { IconLink } from "@/src/components/TabIcons";
+import { normalizarUrl, urlLegivel } from "@/src/lib/url";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 export default function MeuPerfil() {
@@ -82,6 +84,7 @@ export default function MeuPerfil() {
 
   const { profile, professional, hirer, portfolio } = perfil;
   const ehProfissional = profile.tipo === "profissional";
+  const site = professional?.site ?? hirer?.site ?? null;
 
   // A edição do portfólio vive na tela de editar perfil; daqui só levamos
   // a pessoa até lá.
@@ -160,6 +163,20 @@ export default function MeuPerfil() {
       </View>
 
       {!!profile.bio && <Text style={styles.bio}>{profile.bio}</Text>}
+
+      {!!site && (
+        <Pressable
+          style={styles.linkExterno}
+          onPress={() => abrirSite(site)}
+          accessibilityRole="link"
+          accessibilityLabel={`Abrir ${urlLegivel(site)}`}
+        >
+          <IconLink color={colors.magenta} size={16} />
+          <Text style={styles.linkExternoTexto} numberOfLines={1}>
+            {urlLegivel(site)}
+          </Text>
+        </Pressable>
+      )}
 
       {nomesCategorias.length > 0 && (
         <View style={styles.categorias}>
@@ -245,6 +262,13 @@ function Metric({ valor, rotulo }: { valor: string; rotulo: string }) {
   );
 }
 
+
+// O link vem normalizado com esquema na gravação, mas perfil antigo pode
+// ter vindo sem — e `openURL` sem esquema não abre nada nem reclama.
+async function abrirSite(url: string) {
+  await Linking.openURL(normalizarUrl(url) ?? url).catch(() => {});
+}
+
 const styles = StyleSheet.create({
   centro: { flex: 1, alignItems: "center", justifyContent: "center", gap: space.md },
   erroTitulo: { ...type.h2, color: colors.white, textAlign: "center" },
@@ -283,6 +307,14 @@ const styles = StyleSheet.create({
   metricaValor: { ...type.h3, color: colors.white },
   metricaRotulo: { ...type.label, color: colors.inkFaint },
 
+  linkExterno: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.sm,
+    alignSelf: "flex-start",
+    marginTop: space.lg
+  },
+  linkExternoTexto: { ...type.bodyMedium, color: colors.magenta, flexShrink: 1 },
   bio: { ...type.body, color: colors.inkDim, marginTop: space.lg },
   categorias: { flexDirection: "row", flexWrap: "wrap", gap: space.sm, marginTop: space.lg },
 

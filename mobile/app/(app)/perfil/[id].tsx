@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -9,6 +9,8 @@ import { Chip } from "@/src/components/Chip";
 import { buscarPerfil, listarCategorias, type Category, type PerfilCompleto } from "@/src/api/profile";
 import { avaliacoesRecebidas, type AvaliacaoRecebida } from "@/src/api/ratings";
 import { StarRating } from "@/src/components/StarRating";
+import { IconLink } from "@/src/components/TabIcons";
+import { normalizarUrl, urlLegivel } from "@/src/lib/url";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 /** Perfil público — o que o contratante vê antes de escolher. */
@@ -61,6 +63,7 @@ export default function PerfilPublico() {
 
   const { profile, professional, hirer, portfolio } = perfil;
   const ehProfissional = profile.tipo === "profissional";
+  const site = professional?.site ?? hirer?.site ?? null;
 
   const nomesCategorias = categorias
     .filter((c) => professional?.categorias?.includes(c.id))
@@ -110,6 +113,20 @@ export default function PerfilPublico() {
 
       {!!profile.bio && <Text style={styles.bio}>{profile.bio}</Text>}
       {!!hirer?.sobre && <Text style={styles.bio}>{hirer.sobre}</Text>}
+
+      {!!site && (
+        <Pressable
+          style={styles.linkExterno}
+          onPress={() => abrirSite(site)}
+          accessibilityRole="link"
+          accessibilityLabel={`Abrir ${urlLegivel(site)}`}
+        >
+          <IconLink color={colors.magenta} size={16} />
+          <Text style={styles.linkExternoTexto} numberOfLines={1}>
+            {urlLegivel(site)}
+          </Text>
+        </Pressable>
+      )}
 
       {nomesCategorias.length > 0 && (
         <View style={styles.categorias}>
@@ -179,6 +196,13 @@ function Metric({ valor, rotulo }: { valor: string; rotulo: string }) {
   );
 }
 
+
+// O link vem normalizado com esquema na gravação, mas perfil antigo pode
+// ter vindo sem — e `openURL` sem esquema não abre nada nem reclama.
+async function abrirSite(url: string) {
+  await Linking.openURL(normalizarUrl(url) ?? url).catch(() => {});
+}
+
 const styles = StyleSheet.create({
   centro: { flex: 1, alignItems: "center", justifyContent: "center" },
   vazio: { ...type.body, color: colors.inkDim },
@@ -202,6 +226,14 @@ const styles = StyleSheet.create({
   metricaValor: { ...type.h3, color: colors.white },
   metricaRotulo: { ...type.label, color: colors.inkFaint },
 
+  linkExterno: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.sm,
+    alignSelf: "flex-start",
+    marginTop: space.lg
+  },
+  linkExternoTexto: { ...type.bodyMedium, color: colors.magenta, flexShrink: 1 },
   bio: { ...type.body, color: colors.inkDim, marginTop: space.lg },
   categorias: { flexDirection: "row", flexWrap: "wrap", gap: space.sm, marginTop: space.lg },
 
