@@ -98,7 +98,7 @@ export default function MeuPerfil() {
 
   return (
     <Screen
-      logo
+      titulo="Perfil"
       right={
         <HeaderAcoes>
           <SettingsButton />

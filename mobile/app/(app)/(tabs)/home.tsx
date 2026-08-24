@@ -12,6 +12,7 @@ import { buscarFeed, contarNoRaio } from "@/src/api/feed";
 import { idsDasVagasQueAplicei } from "@/src/api/applications";
 import { avaliacoesPendentes } from "@/src/api/ratings";
 import { buscarPerfil } from "@/src/api/profile";
+import { useEhDesktop } from "@/src/lib/layout";
 import { colors, space, type } from "@/src/theme/tokens";
 
 type Resumo = {
@@ -40,6 +41,11 @@ export default function Home() {
   const { profile, session } = useSession();
   const router = useRouter();
   const ehContratante = profile?.tipo === "contratante";
+  // No desktop o rail já mostra avatar, nome e tipo de conta: repetir a
+  // saudação aqui era dizer a mesma coisa duas vezes, a dez centímetros de
+  // distância. Lá a tela se identifica pelo título no header, como as
+  // outras; no celular, sem rail, a saudação continua sendo a abertura.
+  const desktop = useEhDesktop();
   const [r, setR] = useState<Resumo>(VAZIO);
 
   useFocusEffect(
@@ -106,18 +112,24 @@ export default function Home() {
   const primeiroNome = (profile?.nome ?? "por aí").trim().split(" ")[0];
 
   return (
-    <Screen logo right={<NotificationBell />}>
-      {/* A saudação basta: o tipo de conta já se anuncia no conteúdo logo
-          abaixo ("vagas abertas" x "perto de você"), e repetir isso numa
-          sobrancelha em caixa alta era enfeite. */}
-      <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
-        <Text style={styles.title}>
-          Olá,{"\n"}
-          {primeiroNome}.
-        </Text>
-      </Animated.View>
+    <Screen
+      logo={!desktop}
+      titulo={desktop ? "Início" : undefined}
+      right={<NotificationBell />}
+    >
+      {!desktop && (
+        <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
+          <Text style={styles.title}>
+            Olá,{"\n"}
+            {primeiroNome}.
+          </Text>
+        </Animated.View>
+      )}
 
-      <Animated.View entering={FadeInDown.delay(80).duration(500)} style={styles.destaqueBloco}>
+      <Animated.View
+        entering={FadeInDown.delay(80).duration(500)}
+        style={desktop ? styles.destaqueSozinho : styles.destaqueBloco}
+      >
         {ehContratante ? (
           <CardDestaque
             eyebrow="SUAS VAGAS"
@@ -225,6 +237,7 @@ const styles = StyleSheet.create({
   title: { ...type.display, color: colors.white },
 
   destaqueBloco: { marginTop: space.xl },
+  destaqueSozinho: { marginTop: space.md },
   numeros: { flexDirection: "row", gap: space.md, marginTop: space.md },
   pilulas: { gap: space.sm, marginTop: space.xl, paddingBottom: space.xl }
 });
