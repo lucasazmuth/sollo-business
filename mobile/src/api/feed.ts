@@ -24,7 +24,29 @@ export type FiltrosFeed = {
   raioKm?: number | null;
   categorias?: string[] | null;
   apenasUrgentes?: boolean;
+  /**
+   * Lugar escolhido. Escolher um lugar SUBSTITUI o raio no banco: quem
+   * filtra por "RJ" está dizendo que a distância até a própria casa deixou
+   * de ser o critério. `cidade` nula = o estado inteiro.
+   */
+  uf?: string | null;
+  cidade?: string | null;
 };
+
+export type LugarComVagas = { uf: string; cidade: string | null; total: number };
+
+/**
+ * Praças que têm vaga aberta agora.
+ *
+ * O filtro é alimentado por isto e não por uma lista fixa de 27 estados:
+ * uma lista fixa manda a pessoa para dez telas vazias, esta manda para onde
+ * há trabalho.
+ */
+export async function lugaresComVagas(): Promise<LugarComVagas[]> {
+  const { data, error } = await supabase.rpc("lugares_com_vagas");
+  if (error) return [];
+  return (data ?? []) as LugarComVagas[];
+}
 
 /**
  * Feed do profissional logado.
@@ -41,6 +63,8 @@ export async function buscarFeed(
     p_raio_km: filtros.raioKm ?? undefined,
     p_categorias: filtros.categorias?.length ? filtros.categorias : undefined,
     p_only_urgent: filtros.apenasUrgentes ?? false,
+    p_uf: filtros.uf ?? undefined,
+    p_cidade: filtros.cidade ?? undefined,
     p_limit: porPagina,
     p_offset: pagina * porPagina
   });

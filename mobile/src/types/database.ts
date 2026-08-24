@@ -625,6 +625,35 @@ export type Database = {
           },
         ]
       }
+      professional_areas: {
+        Row: {
+          cidade: string | null
+          created_at: string
+          profile_id: string
+          uf: string
+        }
+        Insert: {
+          cidade?: string | null
+          created_at?: string
+          profile_id: string
+          uf: string
+        }
+        Update: {
+          cidade?: string | null
+          created_at?: string
+          profile_id?: string
+          uf?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "professional_areas_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professional_profiles: {
         Row: {
           base_label: string | null
@@ -855,6 +884,10 @@ export type Database = {
       is_job_owner: { Args: { p_job_id: string }; Returns: boolean }
       job_reach_count: { Args: { p_job_id: string }; Returns: number }
       jobs_count_no_raio: { Args: { p_raio_km: number }; Returns: number }
+      lugares_com_vagas: {
+        Args: never
+        Returns: { uf: string; cidade: string | null; total: number }[]
+      }
       jobs_feed: {
         Args: {
           p_categorias?: string[]
@@ -886,10 +919,12 @@ export type Database = {
       jobs_feed_para_mim: {
         Args: {
           p_categorias?: string[]
+          p_cidade?: string
           p_limit?: number
           p_offset?: number
           p_only_urgent?: boolean
           p_raio_km?: number
+          p_uf?: string
         }
         Returns: {
           category_id: string

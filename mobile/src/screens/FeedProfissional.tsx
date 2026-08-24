@@ -17,7 +17,13 @@ import { NotificationBell } from "@/src/components/NotificationBell";
 import { FiltrosVagasModal } from "@/src/components/FiltrosVagasModal";
 import { LARGURA_CONTEUDO, useEhDesktop, useGradeCards } from "@/src/lib/layout";
 import { useSession } from "@/src/lib/session";
-import { buscarFeed, contarNoRaio, type VagaDoFeed } from "@/src/api/feed";
+import {
+  buscarFeed,
+  contarNoRaio,
+  lugaresComVagas,
+  type LugarComVagas,
+  type VagaDoFeed
+} from "@/src/api/feed";
 import { buscarPerfil, listarCategorias, type Category } from "@/src/api/profile";
 import { idsDasVagasQueAplicei } from "@/src/api/applications";
 import { colors, radius, space, type } from "@/src/theme/tokens";
@@ -39,12 +45,16 @@ export function FeedProfissional() {
   const [aplicadas, setAplicadas] = useState<Set<string>>(new Set());
 
   const [raio, setRaio] = useState<number | null>(null); // null = raio do perfil
+  // null = perto de mim. Escolher um lugar substitui o raio.
+  const [lugar, setLugar] = useState<{ uf: string; cidade: string | null } | null>(null);
+  const [lugares, setLugares] = useState<LugarComVagas[]>([]);
   const [categoriaFiltro, setCategoriaFiltro] = useState<string | null>(null);
   const [apenasUrgentes, setApenasUrgentes] = useState(false);
   const [filtrosAbertos, setFiltrosAbertos] = useState(false);
 
   useEffect(() => {
     listarCategorias().then(setCategorias);
+    lugaresComVagas().then(setLugares);
   }, []);
 
   const carregar = useCallback(async () => {
@@ -56,7 +66,9 @@ export function FeedProfissional() {
     // localização de todo mundo na tabela-vitrine.
     const base = !!perfil?.professional?.base_definida;
     setTemBase(base);
-    if (!base) {
+    // Sem base, o feed por raio não tem de onde partir — mas com um lugar
+    // escolhido tem: dá para olhar o Rio antes de configurar a própria base.
+    if (!base && !lugar) {
       setVagas([]);
       return;
     }
@@ -66,7 +78,9 @@ export function FeedProfissional() {
     const resultado = await buscarFeed({
       raioKm: raio,
       categorias: categoriaFiltro ? [categoriaFiltro] : null,
-      apenasUrgentes
+      apenasUrgentes,
+      uf: lugar?.uf ?? null,
+      cidade: lugar?.cidade ?? null
     });
     setVagas(resultado);
 
@@ -74,7 +88,7 @@ export function FeedProfissional() {
     if (resultado.length === 0) {
       setAlemDoRaio(await contarNoRaio(100));
     }
-  }, [userId, raio, categoriaFiltro, apenasUrgentes]);
+  }, [userId, raio, categoriaFiltro, apenasUrgentes, lugar]);
 
   useFocusEffect(
     useCallback(() => {
@@ -95,17 +109,15 @@ export function FeedProfissional() {
   }
 
   const raioEfetivo = raio ?? 30;
-  const filtrosAtivos = (raio !== null ? 1 : 0) + (categoriaFiltro ? 1 : 0) + (apenasUrgentes ? 1 : 0);
+  const filtrosAtivos =
+    (raio !== null ? 1 : 0) + (categoriaFiltro ? 1 : 0) + (apenasUrgentes ? 1 : 0) + (lugar ? 1 : 0);
 
   return (
     <SafeAreaView style={styles.root} edges={["top"]}>
-      {/* Esta tela monta o próprio SafeAreaView em vez de usar `Screen`
-          (o feed rola com RefreshControl), então a fileira do topo entra
-          aqui na mão, no mesmo lugar em que o `Screen` a desenha. O sininho
-          mora aqui, e não junto do título: ao lado do FILTROS ele espremia
-          a contagem de vagas a ponto de truncar ("4 oportunida..."). */}
-      {/* Esta tela monta o próprio SafeAreaView, então repete na mão o
-          header do `Screen`: nome da tela à esquerda, ações à direita. */}
+      {/* Esta tela monta o próprio SafeAreaView em vez de usar `Screen` (o
+          feed rola com RefreshControl), então repete na mão o header: nome
+          da tela à esquerda, ações à direita. O sininho mora aqui, e não
+          junto do FILTROS, onde espremia a contagem a ponto de truncar. */}
       <View style={[styles.barraTopo, desktop && styles.contido]}>
         <Text style={styles.titulo}>Vagas</Text>
         <NotificationBell />
@@ -114,9 +126,16 @@ export function FeedProfissional() {
       <View style={[styles.cabecalho, desktop && styles.contido]}>
         <View style={styles.tituloLinha}>
           <Text style={styles.estado} numberOfLines={1}>
-            {vagas.length > 0
-              ? `${vagas.length} oportunidade${vagas.length > 1 ? "s" : ""} no seu raio`
-              : "Nada no seu raio agora"}
+            {(() => {
+              const onde = lugar
+                ? (lugar.cidade ?? `${lugar.uf} inteiro`)
+                : "no seu raio";
+              return vagas.length > 0
+                ? `${vagas.length} oportunidade${vagas.length > 1 ? "s" : ""} ${
+                    lugar ? `em ${onde}` : onde
+                  }`
+                : `Nada ${lugar ? `em ${onde}` : "no seu raio"} agora`;
+            })()}
           </Text>
 
           <Pressable
@@ -149,7 +168,9 @@ export function FeedProfissional() {
           <View style={styles.centro}>
             <ActivityIndicator color={colors.magenta} />
           </View>
-        ) : temBase === false ? (
+        ) : temBase === false && !lugar ? (
+          // Com um lugar escolhido o feed funciona sem base: quem ainda não
+          // configurou consegue olhar o Rio antes de decidir se entra.
           <View style={styles.aviso}>
             <Text style={styles.avisoTitulo}>Defina onde você atua</Text>
             <Text style={styles.avisoTexto}>
@@ -206,6 +227,9 @@ export function FeedProfissional() {
         aoMudarRaio={setRaio}
         categoriaFiltro={categoriaFiltro}
         aoMudarCategoria={setCategoriaFiltro}
+        lugares={lugares}
+        lugar={lugar}
+        aoMudarLugar={setLugar}
         apenasUrgentes={apenasUrgentes}
         aoMudarUrgentes={setApenasUrgentes}
         totalVagas={vagas.length}

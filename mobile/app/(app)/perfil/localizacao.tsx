@@ -4,10 +4,20 @@ import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
+import { Chip } from "@/src/components/Chip";
 import { avisar } from "@/src/lib/dialogo";
 import { Button } from "@/src/components/Button";
 import { useSession } from "@/src/lib/session";
-import { buscarPerfil, salvarLocalizacao, salvarPerfilProfissional } from "@/src/api/profile";
+import {
+  adicionarPraca,
+  buscarPerfil,
+  listarPracas,
+  removerPraca,
+  salvarLocalizacao,
+  salvarPerfilProfissional,
+  type Praca
+} from "@/src/api/profile";
+import { lugaresComVagas, type LugarComVagas } from "@/src/api/feed";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 const RAIOS = [10, 20, 30, 50, 100];
@@ -29,6 +39,10 @@ export default function Localizacao() {
   const [label, setLabel] = useState<string | null>(null);
   const [coord, setCoord] = useState<{ lat: number; lng: number } | null>(null);
   const [jaDefinido, setJaDefinido] = useState(false);
+  // Praças fora do raio. Vivem em tabela própria e são gravadas na hora do
+  // toque, não no "Salvar": são linhas, não campos de um formulário.
+  const [pracas, setPracas] = useState<Praca[]>([]);
+  const [lugares, setLugares] = useState<LugarComVagas[]>([]);
 
   useEffect(() => {
     if (!userId) return;
@@ -43,10 +57,53 @@ export default function Localizacao() {
       })
       .finally(() => vivo && setCarregando(false));
 
+    listarPracas(userId).then((p) => vivo && setPracas(p));
+    lugaresComVagas().then((l) => vivo && setLugares(l));
+
     return () => {
       vivo = false;
     };
   }, [userId]);
+
+  const temPraca = (uf: string, cidade: string | null) =>
+    pracas.some((p) => p.uf === uf && p.cidade === cidade);
+
+  // Estados que aparecem nas vagas abertas, para oferecer "RJ inteiro".
+  const ufsDisponiveis = Array.from(new Set(lugares.map((l) => l.uf)));
+
+  // Praças já marcadas que sumiram da lista de lugares com vaga: sem isto
+  // elas ficariam gravadas e sem como desmarcar.
+  const pracasForaDaLista = pracas.filter(
+    (p) =>
+      !(p.cidade === null ? ufsDisponiveis.includes(p.uf) : lugares.some((l) => l.uf === p.uf && l.cidade === p.cidade))
+  );
+
+  /**
+   * Grava na hora do toque, e não no "Salvar".
+   *
+   * São linhas numa tabela, não campos deste formulário — e o estado local
+   * é atualizado antes da ida ao banco para o chip responder na hora. Se a
+   * gravação falhar, o estado volta.
+   */
+  async function alternarPraca(praca: Praca) {
+    if (!userId) return;
+    const marcada = temPraca(praca.uf, praca.cidade);
+    const anterior = pracas;
+
+    setPracas(
+      marcada
+        ? pracas.filter((p) => !(p.uf === praca.uf && p.cidade === praca.cidade))
+        : [...pracas, praca]
+    );
+
+    try {
+      if (marcada) await removerPraca(userId, praca);
+      else await adicionarPraca(userId, praca);
+    } catch (e) {
+      setPracas(anterior);
+      avisar("Não deu", e instanceof Error ? e.message : "Falha ao salvar a praça.");
+    }
+  }
 
   async function usarGps() {
     setBuscandoGps(true);
@@ -118,7 +175,8 @@ export default function Localizacao() {
     <Screen back titulo="Onde eu atuo">
       <View style={styles.cabecalho}>
         <Text style={styles.lead}>
-          É esse raio que decide quais vagas chegam até você. Nada fora dele te notifica.
+          O raio decide o que chega até você perto de casa. Para trabalhar fora dele, some
+          as praças que você atende.
         </Text>
       </View>
 
@@ -166,6 +224,48 @@ export default function Localizacao() {
               ? "Bem amplo. Espere vagas que exigem deslocamento longo."
               : "Faixa mais comum para quem atende a região metropolitana."}
         </Text>
+      </View>
+
+      <View style={styles.secaoRaio}>
+        <Text style={styles.rotulo}>TAMBÉM ATENDO</Text>
+        <Text style={styles.ajuda}>
+          Fora do raio, por viagem. Quem mora em São Paulo e fecha trabalho no Rio marca o
+          Rio aqui: sem isso a vaga de lá nunca chega, nem no feed nem por notificação.
+        </Text>
+
+        <View style={styles.pracas}>
+          {ufsDisponiveis.map((uf) => (
+            <Chip
+              key={uf}
+              label={`${uf} inteiro`}
+              selecionado={temPraca(uf, null)}
+              onPress={() => alternarPraca({ uf, cidade: null })}
+            />
+          ))}
+          {lugares.map((l) => (
+            <Chip
+              key={`${l.uf}-${l.cidade}`}
+              label={`${l.cidade}/${l.uf}`}
+              selecionado={temPraca(l.uf, l.cidade)}
+              onPress={() => alternarPraca({ uf: l.uf, cidade: l.cidade })}
+            />
+          ))}
+        </View>
+
+        {/* Praça marcada que já não tem vaga aberta some da lista acima —
+            precisa continuar visível para dar como desmarcar. */}
+        {pracasForaDaLista.length > 0 && (
+          <View style={styles.pracas}>
+            {pracasForaDaLista.map((pr) => (
+              <Chip
+                key={`${pr.uf}-${pr.cidade}`}
+                label={pr.cidade ? `${pr.cidade}/${pr.uf}` : `${pr.uf} inteiro`}
+                selecionado
+                onPress={() => alternarPraca(pr)}
+              />
+            ))}
+          </View>
+        )}
       </View>
 
       <View style={styles.rodape}>
@@ -222,6 +322,7 @@ const styles = StyleSheet.create({
   opcaoTextoAtivo: { color: colors.white },
   ajuda: { ...type.caption, color: colors.inkFaint },
 
+  pracas: { flexDirection: "row", flexWrap: "wrap", gap: space.sm, marginTop: space.md },
   rodape: { marginTop: "auto", paddingTop: space["2xl"], gap: space.md, paddingBottom: space.sm },
   aviso: { ...type.caption, color: colors.inkFaint, textAlign: "center" }
 });

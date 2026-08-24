@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Chip } from "@/src/components/Chip";
 import { Button } from "@/src/components/Button";
 import type { Category } from "@/src/api/profile";
+import type { LugarComVagas } from "@/src/api/feed";
 import { colors, radius, space, type } from "@/src/theme/tokens";
 
 const RAIOS = [10, 20, 30, 50, 100];
@@ -18,6 +19,10 @@ type Props = {
   aoMudarCategoria: (v: string | null) => void;
   apenasUrgentes: boolean;
   aoMudarUrgentes: (v: boolean) => void;
+  /** Praças com vaga aberta agora, para o filtro de lugar. */
+  lugares: LugarComVagas[];
+  lugar: { uf: string; cidade: string | null } | null;
+  aoMudarLugar: (v: { uf: string; cidade: string | null } | null) => void;
   /** Quantas vagas o filtro atual devolve, para o botão de fechar. */
   totalVagas: number;
 };
@@ -43,16 +48,31 @@ export function FiltrosVagasModal({
   aoMudarCategoria,
   apenasUrgentes,
   aoMudarUrgentes,
+  lugares,
+  lugar,
+  aoMudarLugar,
   totalVagas
 }: Props) {
   const insets = useSafeAreaInsets();
-  const ativos = (raio !== null ? 1 : 0) + (categoriaFiltro ? 1 : 0) + (apenasUrgentes ? 1 : 0);
+  const ativos =
+    (raio !== null ? 1 : 0) +
+    (categoriaFiltro ? 1 : 0) +
+    (apenasUrgentes ? 1 : 0) +
+    (lugar ? 1 : 0);
+
+  // Estados presentes nas vagas abertas, para oferecer "RJ inteiro" antes das
+  // cidades: quem viaja para trabalhar pensa em praça, não em município.
+  const ufs = Array.from(new Set(lugares.map((l) => l.uf)));
 
   function limpar() {
     aoMudarRaio(null);
     aoMudarCategoria(null);
     aoMudarUrgentes(false);
+    aoMudarLugar(null);
   }
+
+  const mesmoLugar = (a: { uf: string; cidade: string | null } | null, uf: string, cidade: string | null) =>
+    !!a && a.uf === uf && a.cidade === cidade;
 
   return (
     <Modal visible={visivel} transparent animationType="slide" onRequestClose={onFechar}>
@@ -76,18 +96,55 @@ export function FiltrosVagasModal({
             contentContainerStyle={styles.corpoConteudo}
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.rotulo}>RAIO</Text>
+            <Text style={styles.rotulo}>ONDE</Text>
             <View style={styles.linha}>
-              <Chip label="Meu raio" selecionado={raio === null} onPress={() => aoMudarRaio(null)} />
-              {RAIOS.map((r) => (
+              <Chip label="Perto de mim" selecionado={!lugar} onPress={() => aoMudarLugar(null)} />
+              {ufs.map((uf) => (
                 <Chip
-                  key={r}
-                  label={`${r} km`}
-                  selecionado={raio === r}
-                  onPress={() => aoMudarRaio(r)}
+                  key={uf}
+                  label={`${uf} inteiro`}
+                  selecionado={mesmoLugar(lugar, uf, null)}
+                  onPress={() =>
+                    aoMudarLugar(mesmoLugar(lugar, uf, null) ? null : { uf, cidade: null })
+                  }
+                />
+              ))}
+              {lugares.map((l) => (
+                <Chip
+                  key={`${l.uf}-${l.cidade}`}
+                  label={`${l.cidade} · ${l.total}`}
+                  selecionado={mesmoLugar(lugar, l.uf, l.cidade)}
+                  onPress={() =>
+                    aoMudarLugar(
+                      mesmoLugar(lugar, l.uf, l.cidade) ? null : { uf: l.uf, cidade: l.cidade }
+                    )
+                  }
                 />
               ))}
             </View>
+
+            {/* Escolher um lugar substitui o raio no banco, então mostrar os
+                dois ao mesmo tempo prometeria um cruzamento que não existe. */}
+            {!lugar && (
+              <>
+                <Text style={styles.rotulo}>RAIO</Text>
+                <View style={styles.linha}>
+                  <Chip
+                    label="Meu raio"
+                    selecionado={raio === null}
+                    onPress={() => aoMudarRaio(null)}
+                  />
+                  {RAIOS.map((r) => (
+                    <Chip
+                      key={r}
+                      label={`${r} km`}
+                      selecionado={raio === r}
+                      onPress={() => aoMudarRaio(r)}
+                    />
+                  ))}
+                </View>
+              </>
+            )}
 
             <Text style={styles.rotulo}>CATEGORIA</Text>
             <View style={styles.linha}>

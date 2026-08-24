@@ -133,6 +133,47 @@ export async function buscarDadosPessoais(profileId: string): Promise<DadosPesso
   return data ?? null;
 }
 
+export type Praca = { uf: string; cidade: string | null };
+
+/**
+ * Praças que o profissional atende ALÉM do próprio raio.
+ *
+ * `cidade` nula = o estado inteiro. É o que resolve o caso de quem mora em
+ * São Paulo, atende o Rio e viaja para o job: só com raio ele nunca vê a
+ * vaga nem entra no fanout de notificação.
+ */
+export async function listarPracas(profileId: string): Promise<Praca[]> {
+  const { data } = await supabase
+    .from("professional_areas")
+    .select("uf, cidade")
+    .eq("profile_id", profileId)
+    .order("uf", { ascending: true });
+  return (data ?? []) as Praca[];
+}
+
+export async function adicionarPraca(profileId: string, praca: Praca) {
+  await comRetry(async () => {
+    const { error } = await supabase
+      .from("professional_areas")
+      .insert({ profile_id: profileId, uf: praca.uf, cidade: praca.cidade });
+    // 23505 = já existe. Adicionar de novo o que já está lá não é erro.
+    if (error && error.code !== "23505") throw new Error(error.message);
+  });
+}
+
+export async function removerPraca(profileId: string, praca: Praca) {
+  const q = supabase
+    .from("professional_areas")
+    .delete()
+    .eq("profile_id", profileId)
+    .eq("uf", praca.uf);
+
+  // `.eq(col, null)` vira `col=eq.null` no PostgREST e não casa com NULL —
+  // estado inteiro precisa de `is`.
+  const { error } = praca.cidade === null ? await q.is("cidade", null) : await q.eq("cidade", praca.cidade);
+  if (error) throw new Error(error.message);
+}
+
 /** Publicar vaga exige e-mail verificado, nome completo, CPF, telefone e endereço. */
 export async function cadastroCompletoParaPublicar(profileId: string): Promise<boolean> {
   const { data, error } = await supabase.rpc("hirer_cadastro_completo", {
