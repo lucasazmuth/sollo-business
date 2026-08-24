@@ -50,14 +50,7 @@ export default function Configuracoes() {
   }
 
   return (
-    <Screen back>
-      <View style={styles.cabecalho}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>CONFIGURAÇÕES
-        </Text>
-        <Text style={styles.titulo}>Conta</Text>
-      </View>
-
+    <Screen back titulo="Configurações">
       <View style={[styles.lista, styles.primeiraLista]}>
         <Pressable
           style={styles.item}
@@ -126,10 +119,6 @@ export default function Configuracoes() {
 }
 
 const styles = StyleSheet.create({
-  cabecalho: { gap: space.sm, paddingTop: space.lg },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
-  titulo: { ...type.h1, color: colors.white },
 
   grupoTitulo: { ...type.label, color: colors.inkFaint, marginTop: space.xl },
   lista: { marginTop: space.md, gap: space.sm },

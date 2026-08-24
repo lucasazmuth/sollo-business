@@ -52,9 +52,6 @@ export default function Avaliar() {
   return (
     <Screen back>
       <View style={styles.cabecalho}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>AVALIAR
-        </Text>
         <Text style={styles.titulo}>
           Como foi trabalhar{"\n"}com {nome ?? "essa pessoa"}?
         </Text>
@@ -89,8 +86,6 @@ export default function Avaliar() {
 
 const styles = StyleSheet.create({
   cabecalho: { gap: space.sm, paddingTop: space.lg },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
   titulo: { ...type.h1, color: colors.white },
 
   estrelas: { alignItems: "center", gap: space.md, marginTop: space["2xl"] },

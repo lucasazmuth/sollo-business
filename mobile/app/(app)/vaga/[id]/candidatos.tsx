@@ -101,11 +101,8 @@ export default function Candidatos() {
   const vagaFechada = vaga?.status !== "aberta";
 
   return (
-    <Screen back>
+    <Screen back titulo="Candidatos">
       <View style={styles.cabecalho}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>CANDIDATOS
-        </Text>
         <Text style={styles.titulo} numberOfLines={2}>
           {vaga?.titulo ?? "Vaga"}
         </Text>
@@ -229,8 +226,6 @@ export default function Candidatos() {
 const styles = StyleSheet.create({
   centro: { paddingVertical: space["3xl"], alignItems: "center" },
   cabecalho: { gap: space.sm, paddingTop: space.lg },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
   titulo: { ...type.h2, color: colors.white },
   lead: { ...type.body, color: colors.inkDim },
 

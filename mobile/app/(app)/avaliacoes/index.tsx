@@ -31,13 +31,10 @@ export default function AvaliacoesPendentes() {
   );
 
   return (
-    <Screen back>
+    <Screen back titulo="Avaliações">
       <View style={styles.cabecalho}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>AVALIAÇÕES
-        </Text>
-        <Text style={styles.titulo}>
-          {itens.length === 0 ? "Tudo em dia" : `${itens.length} pendente${itens.length > 1 ? "s" : ""}`}
+        <Text style={styles.estado}>
+          {itens.length === 0 ? "Tudo em dia." : `${itens.length} pendente${itens.length > 1 ? "s" : ""}.`}
         </Text>
         <Text style={styles.lead}>
           Sua avaliação é a reputação que a próxima pessoa vê antes de decidir.
@@ -97,9 +94,7 @@ export default function AvaliacoesPendentes() {
 const styles = StyleSheet.create({
   centro: { paddingVertical: space["3xl"], alignItems: "center" },
   cabecalho: { gap: space.sm, paddingTop: space.lg },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
-  titulo: { ...type.h1, color: colors.white },
+  estado: { ...type.body, color: colors.inkDim },
   lead: { ...type.body, color: colors.inkDim },
 
   lista: { gap: space.md, marginTop: space.xl, paddingBottom: space.xl },

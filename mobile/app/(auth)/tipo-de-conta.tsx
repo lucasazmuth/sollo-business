@@ -39,9 +39,6 @@ export default function TipoDeConta() {
   return (
     <Screen back>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>PASSO 1 DE 2
-        </Text>
         <Text style={styles.title}>Como você{"\n"}vai usar a Sollo Business?</Text>
         <Text style={styles.lead}>Dá para mudar isso depois, no seu perfil.</Text>
       </View>
@@ -84,8 +81,6 @@ export default function TipoDeConta() {
 
 const styles = StyleSheet.create({
   header: { gap: space.md, paddingTop: space.lg, paddingBottom: space["2xl"] },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
   title: { ...type.h1, color: colors.white },
   lead: { ...type.body, color: colors.inkDim },
   list: { flex: 1, gap: space.md, paddingBottom: space.xl },

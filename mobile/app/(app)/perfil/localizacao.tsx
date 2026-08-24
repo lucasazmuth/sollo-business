@@ -115,12 +115,8 @@ export default function Localizacao() {
   const temLocal = !!coord || jaDefinido;
 
   return (
-    <Screen back>
+    <Screen back titulo="Onde eu atuo">
       <View style={styles.cabecalho}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>ONDE EU ATUO
-        </Text>
-        <Text style={styles.titulo}>Até onde{"\n"}você topa ir?</Text>
         <Text style={styles.lead}>
           É esse raio que decide quais vagas chegam até você. Nada fora dele te notifica.
         </Text>
@@ -187,8 +183,6 @@ export default function Localizacao() {
 const styles = StyleSheet.create({
   centro: { flex: 1, alignItems: "center", justifyContent: "center" },
   cabecalho: { gap: space.md, paddingTop: space.lg },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
   titulo: { ...type.h1, color: colors.white },
   lead: { ...type.body, color: colors.inkDim },
 

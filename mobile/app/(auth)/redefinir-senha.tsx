@@ -128,9 +128,6 @@ export default function RedefinirSenha() {
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>NOVA SENHA
-        </Text>
         <Text style={styles.title}>Defina sua{"\n"}nova senha.</Text>
       </View>
 
@@ -168,8 +165,6 @@ export default function RedefinirSenha() {
 
 const styles = StyleSheet.create({
   header: { gap: space.md, paddingTop: space.lg, paddingBottom: space["2xl"] },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
   title: { ...type.h1, color: colors.white },
   lead: { ...type.body, color: colors.inkDim, textAlign: "center", marginTop: space.sm },
   hint: { ...type.caption, color: colors.inkFaint, marginTop: -space.sm },

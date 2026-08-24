@@ -59,9 +59,6 @@ export default function Cadastro() {
   return (
     <Screen back>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>PASSO 2 DE 2 · {tipo.toUpperCase()}
-        </Text>
         <Text style={styles.title}>Criar conta</Text>
         <Text style={styles.lead}>
           Leva menos de um minuto. Você completa o perfil depois de entrar.
@@ -160,8 +157,6 @@ export default function Cadastro() {
 
 const styles = StyleSheet.create({
   header: { gap: space.md, paddingTop: space.lg, paddingBottom: space.xl },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
   title: { ...type.h1, color: colors.white },
   lead: { ...type.body, color: colors.inkDim },
   form: { flex: 1, gap: space.lg, paddingBottom: space.xl },

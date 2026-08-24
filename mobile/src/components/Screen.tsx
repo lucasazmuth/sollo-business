@@ -27,6 +27,15 @@ type Props = {
    * juntas apareciam lado a lado, a poucos centímetros uma da outra.
    */
   logo?: boolean;
+  /**
+   * Nome da tela, no header.
+   *
+   * Substitui o par "sobrancelha + título gigante" que cada tela repetia no
+   * corpo (● CONVERSAS / "Em dia"). Aquilo comia um terço da tela para
+   * dizer onde a pessoa já sabia que estava, e o pontinho colorido antes de
+   * um rótulo em caixa alta virou maneirismo, não informação.
+   */
+  titulo?: string;
   /** Ação no canto direito da fileira do topo (ex.: sininho de notificações). */
   right?: React.ReactNode;
   contentStyle?: ViewStyle;
@@ -50,6 +59,7 @@ export function Screen({
   scroll = true,
   back = false,
   logo = false,
+  titulo,
   right,
   contentStyle
 }: Props) {
@@ -76,25 +86,36 @@ export function Screen({
     <SafeAreaView style={styles.root} edges={["top", "bottom"]}>
       {/* No fluxo, não absoluto: como irmão do KeyboardAvoidingView (flex:1)
           o botão ficava coberto por ele e os toques não chegavam. */}
-      {(back || mostraLogo || right) && (
+      {(back || mostraLogo || titulo || right) && (
         <View style={[styles.barraVoltar, desktop && styles.barraDesktop]}>
-          {back ? (
-            <Pressable
-              onPress={() => router.back()}
-              hitSlop={16}
-              accessibilityRole="button"
-              accessibilityLabel="Voltar"
-              style={styles.back}
-            >
-              <Text style={styles.backIcon}>←</Text>
-            </Pressable>
-          ) : mostraLogo ? (
-            <View style={styles.marca}>
-              <Wordmark width={78} />
-            </View>
-          ) : (
-            <View />
-          )}
+          <View style={styles.esquerda}>
+            {back && (
+              <Pressable
+                onPress={() => router.back()}
+                hitSlop={16}
+                accessibilityRole="button"
+                accessibilityLabel="Voltar"
+                style={styles.back}
+              >
+                <Text style={styles.backIcon}>←</Text>
+              </Pressable>
+            )}
+
+            {/* A marca só aparece onde não há título: as duas juntas
+                brigariam pelo mesmo canto. */}
+            {!titulo && mostraLogo && (
+              <View style={styles.marca}>
+                <Wordmark width={78} />
+              </View>
+            )}
+
+            {!!titulo && (
+              <Text style={styles.titulo} numberOfLines={1}>
+                {titulo}
+              </Text>
+            )}
+          </View>
+
           {right}
         </View>
       )}
@@ -150,6 +171,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg
   },
   backIcon: { ...type.h3, color: colors.white, marginTop: -2 },
+  esquerda: { flex: 1, flexDirection: "row", alignItems: "center", gap: space.md },
+  titulo: { ...type.h3, color: colors.white, flexShrink: 1 },
   // Mesma altura do botão voltar/sininho, para a fileira não pular de altura
   // entre uma tela e outra.
   marca: { height: 44, justifyContent: "center" }

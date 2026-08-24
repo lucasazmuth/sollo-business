@@ -31,9 +31,6 @@ export default function RecuperarSenha() {
   return (
     <Screen back>
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>RECUPERAR ACESSO
-        </Text>
         <Text style={styles.title}>Esqueceu{"\n"}a senha?</Text>
         <Text style={styles.lead}>
           Informe o e-mail da sua conta e enviaremos um link para você criar uma nova senha.
@@ -78,8 +75,6 @@ export default function RecuperarSenha() {
 
 const styles = StyleSheet.create({
   header: { gap: space.md, paddingTop: space.lg, paddingBottom: space["2xl"] },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
   title: { ...type.h1, color: colors.white },
   lead: { ...type.body, color: colors.inkDim },
   form: { flex: 1, gap: space.lg },

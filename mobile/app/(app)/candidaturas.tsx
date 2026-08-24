@@ -47,13 +47,12 @@ export default function MinhasCandidaturas() {
   const selecionadas = itens.filter((i) => i.status === "selecionada").length;
 
   return (
-    <Screen back>
+    <Screen back titulo="Minhas candidaturas">
       <View style={styles.cabecalho}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>MINHAS CANDIDATURAS
-        </Text>
-        <Text style={styles.titulo}>
-          {itens.length === 0 ? "Nenhuma ainda" : `${itens.length} enviada${itens.length > 1 ? "s" : ""}`}
+        <Text style={styles.estado}>
+          {itens.length === 0
+            ? "Você ainda não se candidatou a nenhuma vaga."
+            : `${itens.length} enviada${itens.length > 1 ? "s" : ""}.`}
         </Text>
         {selecionadas > 0 && (
           <Text style={styles.destaque}>
@@ -118,9 +117,7 @@ export default function MinhasCandidaturas() {
 const styles = StyleSheet.create({
   centro: { paddingVertical: space["3xl"], alignItems: "center" },
   cabecalho: { gap: space.sm, paddingTop: space.lg },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
-  titulo: { ...type.h1, color: colors.white },
+  estado: { ...type.body, color: colors.inkDim },
   destaque: { ...type.bodyMedium, color: colors.lime },
 
   lista: { gap: space.md, marginTop: space.xl, paddingBottom: space.xl },

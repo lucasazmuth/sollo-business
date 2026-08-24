@@ -120,12 +120,8 @@ export default function CompletarCadastro() {
   }
 
   return (
-    <Screen back>
+    <Screen back titulo="Complete seu cadastro">
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>ANTES DE PUBLICAR
-        </Text>
-        <Text style={styles.title}>Complete seu cadastro</Text>
         <Text style={styles.lead}>
           Precisamos desses dados uma vez só, antes da primeira vaga.
         </Text>
@@ -244,9 +240,6 @@ export default function CompletarCadastro() {
 
 const styles = StyleSheet.create({
   header: { gap: space.sm, paddingTop: space.lg, paddingBottom: space.xl },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
-  title: { ...type.h1, color: colors.white },
   lead: { ...type.body, color: colors.inkDim },
 
   form: { gap: space.lg },

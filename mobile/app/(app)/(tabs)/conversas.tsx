@@ -45,13 +45,14 @@ export default function Conversas() {
   const naoLidas = itens.reduce((t, c) => t + c.naoLidas, 0);
 
   return (
-    <Screen logo right={<NotificationBell />}>
+    <Screen titulo="Conversas" right={<NotificationBell />}>
       <View style={styles.cabecalho}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>CONVERSAS
-        </Text>
-        <Text style={styles.titulo}>
-          {naoLidas > 0 ? `${naoLidas} não lida${naoLidas > 1 ? "s" : ""}` : "Em dia"}
+        <Text style={styles.estado}>
+          {naoLidas > 0
+            ? `${naoLidas} não lida${naoLidas > 1 ? "s" : ""}`
+            : itens.length > 0
+              ? "Tudo em dia."
+              : ""}
         </Text>
       </View>
 
@@ -114,10 +115,8 @@ export default function Conversas() {
 
 const styles = StyleSheet.create({
   centro: { paddingVertical: space["3xl"], alignItems: "center" },
-  cabecalho: { gap: space.sm, paddingTop: space.lg },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
-  titulo: { ...type.h1, color: colors.white },
+  cabecalho: { paddingTop: space.sm, paddingBottom: space.lg },
+  estado: { ...type.body, color: colors.inkDim },
 
   lista: { gap: space.sm, marginTop: space.xl, paddingBottom: space.xl },
   card: {

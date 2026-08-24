@@ -16,7 +16,6 @@ import { VagaCard } from "@/src/components/VagaCard";
 import { NotificationBell } from "@/src/components/NotificationBell";
 import { FiltrosVagasModal } from "@/src/components/FiltrosVagasModal";
 import { LARGURA_CONTEUDO, useEhDesktop, useGradeCards } from "@/src/lib/layout";
-import { Wordmark } from "@/src/components/Logo";
 import { useSession } from "@/src/lib/session";
 import { buscarFeed, contarNoRaio, type VagaDoFeed } from "@/src/api/feed";
 import { buscarPerfil, listarCategorias, type Category } from "@/src/api/profile";
@@ -105,24 +104,20 @@ export function FeedProfissional() {
           aqui na mão, no mesmo lugar em que o `Screen` a desenha. O sininho
           mora aqui, e não junto do título: ao lado do FILTROS ele espremia
           a contagem de vagas a ponto de truncar ("4 oportunida..."). */}
+      {/* Esta tela monta o próprio SafeAreaView, então repete na mão o
+          header do `Screen`: nome da tela à esquerda, ações à direita. */}
       <View style={[styles.barraTopo, desktop && styles.contido]}>
-        {/* Em desktop a marca já está no rail; repetir aqui seria ruído. */}
-        {desktop ? <View /> : <Wordmark width={78} />}
+        <Text style={styles.titulo}>Vagas</Text>
         <NotificationBell />
       </View>
 
       <View style={[styles.cabecalho, desktop && styles.contido]}>
         <View style={styles.tituloLinha}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.eyebrow}>
-              <Text style={styles.dot}>● </Text>VAGAS PERTO DE VOCÊ
-            </Text>
-            <Text style={styles.titulo} numberOfLines={1}>
-              {vagas.length > 0
-                ? `${vagas.length} oportunidade${vagas.length > 1 ? "s" : ""}`
-                : "Feed"}
-            </Text>
-          </View>
+          <Text style={styles.estado} numberOfLines={1}>
+            {vagas.length > 0
+              ? `${vagas.length} oportunidade${vagas.length > 1 ? "s" : ""} no seu raio`
+              : "Nada no seu raio agora"}
+          </Text>
 
           <Pressable
             onPress={() => setFiltrosAbertos(true)}
@@ -237,10 +232,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.line
   },
-  tituloLinha: { flexDirection: "row", alignItems: "flex-end", gap: space.md },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
-  titulo: { ...type.h2, color: colors.white, marginTop: space.sm },
+  tituloLinha: { flexDirection: "row", alignItems: "center", gap: space.md },
+  titulo: { ...type.h3, color: colors.white },
+  estado: { ...type.body, color: colors.inkDim, flex: 1 },
 
   botaoFiltro: {
     paddingVertical: space.sm + 2,

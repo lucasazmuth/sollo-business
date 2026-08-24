@@ -107,11 +107,10 @@ export default function Home() {
 
   return (
     <Screen logo right={<NotificationBell />}>
+      {/* A saudação basta: o tipo de conta já se anuncia no conteúdo logo
+          abaixo ("vagas abertas" x "perto de você"), e repetir isso numa
+          sobrancelha em caixa alta era enfeite. */}
       <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>
-          {ehContratante ? "CONTRATANTE" : "PROFISSIONAL"}
-        </Text>
         <Text style={styles.title}>
           Olá,{"\n"}
           {primeiroNome}.
@@ -222,10 +221,8 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  header: { gap: space.sm, paddingTop: space.lg },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
-  title: { ...type.display, color: colors.white, marginTop: space.xs },
+  header: { paddingTop: space.lg },
+  title: { ...type.display, color: colors.white },
 
   destaqueBloco: { marginTop: space.xl },
   numeros: { flexDirection: "row", gap: space.md, marginTop: space.md },

@@ -67,12 +67,11 @@ export default function PreferenciasNotificacao() {
   }
 
   return (
-    <Screen back>
+    <Screen back titulo="Notificações">
       <View style={styles.cabecalho}>
-        <Text style={styles.eyebrow}>
-          <Text style={styles.dot}>● </Text>NOTIFICAÇÕES
+        <Text style={styles.lead}>
+          Escolha o que vale um aviso. O que estiver desligado aqui não chega de jeito nenhum.
         </Text>
-        <Text style={styles.titulo}>O que avisar,{"\n"}e como.</Text>
       </View>
 
       {!!statusPush && (
@@ -211,9 +210,7 @@ function Linha({
 const styles = StyleSheet.create({
   centro: { flex: 1, alignItems: "center", justifyContent: "center" },
   cabecalho: { gap: space.md, paddingTop: space.lg },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
-  titulo: { ...type.h1, color: colors.white },
+  lead: { ...type.body, color: colors.inkDim },
 
   statusPush: {
     marginTop: space.xl,

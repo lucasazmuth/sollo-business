@@ -85,12 +85,10 @@ export default function Notificacoes() {
             <Text style={styles.botaoVoltarIcon}>←</Text>
           </Pressable>
 
-          <View style={{ flex: 1 }}>
-            <Text style={styles.eyebrow}>
-              <Text style={styles.dot}>● </Text>NOTIFICAÇÕES
-            </Text>
-            <Text style={styles.titulo} numberOfLines={1}>
-              {naoLidas > 0 ? `${naoLidas} não lida${naoLidas > 1 ? "s" : ""}` : "Em dia"}
+          <View style={styles.identidade}>
+            <Text style={styles.titulo}>Notificações</Text>
+            <Text style={styles.estado} numberOfLines={1}>
+              {naoLidas > 0 ? `${naoLidas} não lida${naoLidas > 1 ? "s" : ""}` : "Tudo em dia."}
             </Text>
           </View>
 
@@ -198,9 +196,9 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   botaoVoltarIcon: { ...type.h3, color: colors.white, marginTop: -2 },
-  eyebrow: { ...type.label, color: colors.inkDim },
-  dot: { color: colors.magenta },
-  titulo: { ...type.h2, color: colors.white, marginTop: space.sm },
+  identidade: { flex: 1 },
+  titulo: { ...type.h3, color: colors.white },
+  estado: { ...type.caption, color: colors.inkFaint },
   botaoAjustes: {
     paddingVertical: space.sm + 2,
     paddingHorizontal: space.lg,
