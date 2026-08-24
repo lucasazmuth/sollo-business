@@ -25,10 +25,12 @@ type Props = TextInputProps & {
    * cadastro reduzidos a uma caixinha ilegível.
    */
   containerStyle?: StyleProp<ViewStyle>;
+  /** Ícone dentro da caixa, à esquerda do texto. */
+  icone?: React.ReactNode;
 };
 
 export const Input = forwardRef<TextInput, Props>(function Input(
-  { label, error, secure, style, containerStyle, ...rest },
+  { label, error, secure, style, containerStyle, icone, ...rest },
   ref
 ) {
   const [focused, setFocused] = useState(false);
@@ -45,6 +47,8 @@ export const Input = forwardRef<TextInput, Props>(function Input(
           !!error && styles.fieldError
         ]}
       >
+        {!!icone && <View style={styles.icone}>{icone}</View>}
+
         <TextInput
           ref={ref}
           style={[styles.input, style]}
@@ -95,6 +99,7 @@ const styles = StyleSheet.create({
   },
   fieldFocused: { borderColor: colors.magenta, backgroundColor: "rgba(255,255,255,0.06)" },
   fieldError: { borderColor: colors.danger },
+  icone: { width: 20, alignItems: "center" },
   input: { flex: 1, ...type.bodyMedium, color: colors.ink, paddingVertical: space.md },
   toggle: { ...type.label, color: colors.inkDim },
   error: { ...type.caption, color: colors.danger }

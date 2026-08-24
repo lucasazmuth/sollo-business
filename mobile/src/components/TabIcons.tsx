@@ -117,3 +117,45 @@ export function IconMais({ color, size = 20 }: Props) {
     </Svg>
   );
 }
+
+/* Ícones dos campos de autenticação. */
+
+export function IconEnvelope({ color, size = 18 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M3.5 7.5A2.5 2.5 0 0 1 6 5h12a2.5 2.5 0 0 1 2.5 2.5v9A2.5 2.5 0 0 1 18 19H6a2.5 2.5 0 0 1-2.5-2.5v-9Z"
+        stroke={color}
+        strokeWidth={1.6}
+      />
+      <Path d="m4.5 7.5 7.5 5.5 7.5-5.5" stroke={color} strokeWidth={1.6} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+export function IconCadeado({ color, size = 18 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M5.5 11.5A1.5 1.5 0 0 1 7 10h10a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 17 20H7a1.5 1.5 0 0 1-1.5-1.5v-7Z"
+        stroke={color}
+        strokeWidth={1.6}
+      />
+      <Path d="M8.5 10V7.8a3.5 3.5 0 1 1 7 0V10" stroke={color} strokeWidth={1.6} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+export function IconPessoa({ color, size = 18 }: Props) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={12} cy={8} r={3.4} stroke={color} strokeWidth={1.6} />
+      <Path
+        d="M4.8 20c.6-3.6 3.6-5.6 7.2-5.6s6.6 2 7.2 5.6"
+        stroke={color}
+        strokeWidth={1.6}
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+}

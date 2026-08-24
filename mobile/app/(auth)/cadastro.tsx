@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
+import { IconCadeado, IconEnvelope, IconPessoa } from "@/src/components/TabIcons";
 import { ehAuthError, passwordIssue, signUp, type AccountType } from "@/src/lib/auth";
 import { colors, space, type } from "@/src/theme/tokens";
 
@@ -75,6 +76,7 @@ export default function Cadastro() {
           placeholder="Como podemos te chamar?"
           autoCapitalize="words"
           autoComplete="name"
+          icone={<IconPessoa color={colors.inkFaint} />}
           returnKeyType="next"
           onSubmitEditing={() => emailRef.current?.focus()}
           error={errors.nome}
@@ -89,6 +91,7 @@ export default function Cadastro() {
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
+          icone={<IconEnvelope color={colors.inkFaint} />}
           returnKeyType="next"
           onSubmitEditing={() => senhaRef.current?.focus()}
           error={errors.email}
@@ -102,6 +105,7 @@ export default function Cadastro() {
           placeholder="Mínimo de 8 caracteres"
           autoCapitalize="none"
           autoComplete="new-password"
+          icone={<IconCadeado color={colors.inkFaint} />}
           secure
           returnKeyType="done"
           onSubmitEditing={onSubmit}

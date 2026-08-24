@@ -45,18 +45,21 @@ const styles = StyleSheet.create({
   // flex:1 nas caixas em vez de largura fixa — o código já variou de 6 pra
   // 8 dígitos uma vez (o tamanho é configurável no projeto Supabase), então
   // a largura precisa se ajustar sozinha em vez de estourar a tela.
-  wrap: { flexDirection: "row", gap: space.xs, position: "relative" },
+  wrap: { flexDirection: "row", gap: space.sm, position: "relative" },
   caixa: {
     flex: 1,
-    height: 56,
+    // Caixa alta e quadrada: o dígito precisa ser lido de relance por quem
+    // está alternando entre o app e o e-mail.
+    aspectRatio: 0.86,
+    maxHeight: 68,
     borderRadius: radius.md,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.line,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.surface
   },
-  caixaAtiva: { borderColor: colors.magenta },
-  digito: { ...type.h2, color: colors.white },
+  caixaAtiva: { borderColor: colors.magenta, backgroundColor: colors.surface2 },
+  digito: { ...type.h1, color: colors.white },
   inputReal: { position: "absolute", inset: 0, opacity: 0 }
 });

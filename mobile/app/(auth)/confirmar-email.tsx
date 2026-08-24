@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Screen } from "@/src/components/Screen";
@@ -70,7 +70,15 @@ export default function ConfirmarEmail() {
       );
       setCodigo("");
     } else {
-      router.replace("/home");
+      router.replace({
+        pathname: "/(auth)/sucesso",
+        params: {
+          titulo: "E-mail confirmado",
+          texto: "Sua conta está pronta. Agora é montar o perfil e entrar no radar.",
+          destino: "/home",
+          botao: "Começar"
+        }
+      });
     }
     setConfirmando(false);
   }
@@ -99,8 +107,8 @@ export default function ConfirmarEmail() {
         </Text>
         <Text style={styles.title}>Confirme{"\n"}seu e-mail.</Text>
         <Text style={styles.lead}>
-          Mandamos um código de {TAMANHO_CODIGO} dígitos para {emailNormalizado ?? "seu e-mail"}.
-          Digite abaixo.
+          Mandamos um código de {TAMANHO_CODIGO} dígitos para{" "}
+          <Text style={styles.email}>{emailNormalizado ?? "seu e-mail"}</Text>. Digite abaixo.
         </Text>
       </View>
 
@@ -115,6 +123,12 @@ export default function ConfirmarEmail() {
           }}
           autoFocus
         />
+
+        {/* Reenviar vira link à direita, como na referência: era um botão
+            do mesmo peso do "Confirmar" e competia com ele. */}
+        <Pressable onPress={reenviar} disabled={reenviando} hitSlop={10} style={styles.reenviarWrap}>
+          <Text style={styles.reenviar}>{reenviando ? "Reenviando…" : "Reenviar código"}</Text>
+        </Pressable>
 
         {!!erro && (
           <Animated.Text entering={FadeIn.duration(300)} style={styles.erro}>
@@ -144,7 +158,6 @@ export default function ConfirmarEmail() {
           loading={confirmando}
           disabled={codigo.length < MINIMO_CODIGO}
         />
-        <Button label="Reenviar código" variant="ghost" loading={reenviando} onPress={reenviar} />
       </View>
     </Screen>
   );
@@ -157,6 +170,9 @@ const styles = StyleSheet.create({
   title: { ...type.h1, color: colors.white },
   lead: { ...type.body, color: colors.inkDim },
   corpo: { flex: 1, gap: space.lg },
+  email: { color: colors.magenta, fontFamily: type.h3.fontFamily },
+  reenviarWrap: { alignSelf: "flex-end" },
+  reenviar: { ...type.caption, color: colors.magenta, fontFamily: type.h3.fontFamily },
   erro: { ...type.caption, color: colors.danger },
   aviso: { ...type.caption, color: colors.lime },
   card: {

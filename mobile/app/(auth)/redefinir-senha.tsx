@@ -111,21 +111,18 @@ export default function RedefinirSenha() {
   }
 
   if (sucesso) {
-    return (
-      <Screen scroll={false}>
-        <View style={styles.centro}>
-          <Animated.View entering={FadeIn.duration(400)} style={styles.success}>
-            <Text style={styles.successTitle}>Senha alterada</Text>
-            <Text style={styles.successText}>Pronto — já dá pra continuar usando o app.</Text>
-          </Animated.View>
-          <Button
-            label="Continuar"
-            onPress={() => router.replace("/home")}
-            style={{ marginTop: space.lg }}
-          />
-        </View>
-      </Screen>
-    );
+    // Rota própria em vez de um bloco aqui: a tela de sucesso é a mesma da
+    // confirmação de e-mail, só muda o texto.
+    router.replace({
+      pathname: "/(auth)/sucesso",
+      params: {
+        titulo: "Senha alterada",
+        texto: "Pronto. Já dá para continuar usando o app normalmente.",
+        destino: "/home",
+        botao: "Continuar"
+      }
+    });
+    return null;
   }
 
   return (
@@ -182,14 +179,4 @@ const styles = StyleSheet.create({
 
   centro: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: space.xl },
 
-  success: {
-    gap: space.sm,
-    padding: space.xl,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.lime,
-    backgroundColor: "rgba(206,254,42,0.06)"
-  },
-  successTitle: { ...type.h3, color: colors.lime, textAlign: "center" },
-  successText: { ...type.body, color: colors.inkDim, textAlign: "center" }
 });

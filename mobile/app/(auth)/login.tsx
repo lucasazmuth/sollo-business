@@ -5,6 +5,7 @@ import { Screen } from "@/src/components/Screen";
 import { Button } from "@/src/components/Button";
 import { Input } from "@/src/components/Input";
 import { Wordmark } from "@/src/components/Logo";
+import { IconCadeado, IconEnvelope } from "@/src/components/TabIcons";
 import { ehAuthError, signIn } from "@/src/lib/auth";
 import { colors, space, type } from "@/src/theme/tokens";
 
@@ -47,7 +48,9 @@ export default function Login() {
       <View style={styles.header}>
         <Wordmark width={104} />
         <Text style={styles.title}>Bem-vindo{"\n"}de volta.</Text>
-        <Text style={styles.lead}>Entre para acompanhar seus projetos e conversas.</Text>
+        <Text style={styles.lead}>
+          Suas vagas, candidaturas e conversas continuam de onde pararam.
+        </Text>
       </View>
 
       <View style={styles.form}>
@@ -59,6 +62,7 @@ export default function Login() {
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
+          icone={<IconEnvelope color={colors.inkFaint} />}
           returnKeyType="next"
           onSubmitEditing={() => senhaRef.current?.focus()}
           error={errors.email}
@@ -72,6 +76,7 @@ export default function Login() {
           placeholder="Sua senha"
           autoCapitalize="none"
           autoComplete="current-password"
+          icone={<IconCadeado color={colors.inkFaint} />}
           secure
           returnKeyType="done"
           onSubmitEditing={onSubmit}
