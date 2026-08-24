@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { usePathname, useRouter } from "expo-router";
 import { Avatar } from "@/src/components/Avatar";
-import { Wordmark } from "@/src/components/Logo";
+import { IconMark } from "@/src/components/Logo";
 import { IconConversas, IconEstrela, IconInicio, IconPerfil, IconVagas } from "@/src/components/TabIcons";
 import { useSession } from "@/src/lib/session";
 import { LARGURA_RAIL } from "@/src/lib/layout";
@@ -42,8 +42,11 @@ export function SideRail() {
 
   return (
     <View style={styles.rail}>
+      {/* Símbolo isolado, não o logotipo inteiro: numa coluna de 260px a
+          palavra "sollo" precisa encolher tanto que perde peso e briga com
+          os itens do menu logo abaixo. */}
       <View style={styles.topo}>
-        <Wordmark width={92} />
+        <IconMark width={38} />
       </View>
 
       <Pressable

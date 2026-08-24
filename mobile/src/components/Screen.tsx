@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Wordmark } from "@/src/components/Logo";
+import { IconMark } from "@/src/components/Logo";
 import { LARGURA_CONTEUDO, useEhDesktop } from "@/src/lib/layout";
 import { colors, space, type } from "@/src/theme/tokens";
 
@@ -101,11 +101,13 @@ export function Screen({
               </Pressable>
             )}
 
-            {/* A marca só aparece onde não há título: as duas juntas
-                brigariam pelo mesmo canto. */}
+            {/* Símbolo isolado: na fileira do topo ele divide espaço com o
+                sininho e com o que mais entrar ali, e o logotipo por extenso
+                nesse tamanho vira um borrão. Só aparece onde não há título —
+                as duas marcas juntas brigariam pelo mesmo canto. */}
             {!titulo && mostraLogo && (
               <View style={styles.marca}>
-                <Wordmark width={78} />
+                <IconMark width={34} />
               </View>
             )}
 
