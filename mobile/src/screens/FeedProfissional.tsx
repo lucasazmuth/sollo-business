@@ -14,7 +14,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { Button } from "@/src/components/Button";
 import { VagaCard } from "@/src/components/VagaCard";
 import { NotificationBell } from "@/src/components/NotificationBell";
-import { FiltrosVagasModal } from "@/src/components/FiltrosVagasModal";
+import { FiltrosVagasModal, type Lugar } from "@/src/components/FiltrosVagasModal";
 import { LARGURA_CONTEUDO, useEhDesktop, useGradeCards } from "@/src/lib/layout";
 import { useSession } from "@/src/lib/session";
 import {
@@ -45,8 +45,10 @@ export function FeedProfissional() {
   const [aplicadas, setAplicadas] = useState<Set<string>>(new Set());
 
   const [raio, setRaio] = useState<number | null>(null); // null = raio do perfil
-  // null = perto de mim. Escolher um lugar substitui o raio.
-  const [lugar, setLugar] = useState<{ uf: string; cidade: string | null } | null>(null);
+  // null = perto de mim, "brasil" = sem recorte. Qualquer um dos dois
+  // substitui o raio.
+  const [lugar, setLugar] = useState<Lugar>(null);
+  const recorte = lugar !== null && lugar !== "brasil" ? lugar : null;
   const [lugares, setLugares] = useState<LugarComVagas[]>([]);
   const [categoriaFiltro, setCategoriaFiltro] = useState<string | null>(null);
   const [apenasUrgentes, setApenasUrgentes] = useState(false);
@@ -79,8 +81,9 @@ export function FeedProfissional() {
       raioKm: raio,
       categorias: categoriaFiltro ? [categoriaFiltro] : null,
       apenasUrgentes,
-      uf: lugar?.uf ?? null,
-      cidade: lugar?.cidade ?? null
+      uf: recorte?.uf ?? null,
+      cidade: recorte?.cidade ?? null,
+      qualquerLugar: lugar === "brasil"
     });
     setVagas(resultado);
 
@@ -127,14 +130,15 @@ export function FeedProfissional() {
         <View style={styles.tituloLinha}>
           <Text style={styles.estado} numberOfLines={1}>
             {(() => {
-              const onde = lugar
-                ? (lugar.cidade ?? `${lugar.uf} inteiro`)
-                : "no seu raio";
+              const onde =
+                lugar === "brasil"
+                  ? "no Brasil"
+                  : recorte
+                    ? `em ${recorte.cidade ?? `${recorte.uf} inteiro`}`
+                    : "no seu raio";
               return vagas.length > 0
-                ? `${vagas.length} oportunidade${vagas.length > 1 ? "s" : ""} ${
-                    lugar ? `em ${onde}` : onde
-                  }`
-                : `Nada ${lugar ? `em ${onde}` : "no seu raio"} agora`;
+                ? `${vagas.length} oportunidade${vagas.length > 1 ? "s" : ""} ${onde}`
+                : `Nada ${onde} agora`;
             })()}
           </Text>
 

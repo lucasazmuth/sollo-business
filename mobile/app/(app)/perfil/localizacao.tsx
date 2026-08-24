@@ -175,8 +175,8 @@ export default function Localizacao() {
     <Screen back titulo="Onde eu atuo">
       <View style={styles.cabecalho}>
         <Text style={styles.lead}>
-          O raio decide o que chega até você perto de casa. Para trabalhar fora dele, some
-          as praças que você atende.
+          Isto decide o que te AVISAMOS. Para procurar vaga em qualquer lugar do país, não
+          precisa configurar nada: é só filtrar por lugar no feed.
         </Text>
       </View>
 
@@ -227,10 +227,11 @@ export default function Localizacao() {
       </View>
 
       <View style={styles.secaoRaio}>
-        <Text style={styles.rotulo}>TAMBÉM ATENDO</Text>
+        <Text style={styles.rotulo}>AVISAR TAMBÉM SOBRE</Text>
         <Text style={styles.ajuda}>
-          Fora do raio, por viagem. Quem mora em São Paulo e fecha trabalho no Rio marca o
-          Rio aqui: sem isso a vaga de lá nunca chega, nem no feed nem por notificação.
+          Praças fora do seu raio das quais você quer ser avisado. Só isso: no feed você já
+          alcança o Brasil inteiro sem marcar nada aqui. Marque onde realmente vale o
+          telefone tocar, senão vira spam.
         </Text>
 
         <View style={styles.pracas}>

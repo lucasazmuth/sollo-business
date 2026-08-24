@@ -31,6 +31,14 @@ export type FiltrosFeed = {
    */
   uf?: string | null;
   cidade?: string | null;
+  /**
+   * Sem recorte de lugar nenhum: o país inteiro.
+   *
+   * Existe porque quem vive rodando não tem lista de praças que fique em
+   * dia. A ordenação por distância continua valendo, então o que está perto
+   * aparece primeiro mesmo olhando tudo.
+   */
+  qualquerLugar?: boolean;
 };
 
 export type LugarComVagas = { uf: string; cidade: string | null; total: number };
@@ -65,6 +73,7 @@ export async function buscarFeed(
     p_only_urgent: filtros.apenasUrgentes ?? false,
     p_uf: filtros.uf ?? undefined,
     p_cidade: filtros.cidade ?? undefined,
+    p_qualquer_lugar: filtros.qualquerLugar ?? false,
     p_limit: porPagina,
     p_offset: pagina * porPagina
   });

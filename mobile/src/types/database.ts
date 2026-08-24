@@ -923,6 +923,7 @@ export type Database = {
           p_limit?: number
           p_offset?: number
           p_only_urgent?: boolean
+          p_qualquer_lugar?: boolean
           p_raio_km?: number
           p_uf?: string
         }

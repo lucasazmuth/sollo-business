@@ -8,6 +8,8 @@ import { colors, radius, space, type } from "@/src/theme/tokens";
 
 const RAIOS = [10, 20, 30, 50, 100];
 
+export type Lugar = { uf: string; cidade: string | null } | "brasil" | null;
+
 type Props = {
   visivel: boolean;
   onFechar: () => void;
@@ -21,8 +23,9 @@ type Props = {
   aoMudarUrgentes: (v: boolean) => void;
   /** Praças com vaga aberta agora, para o filtro de lugar. */
   lugares: LugarComVagas[];
-  lugar: { uf: string; cidade: string | null } | null;
-  aoMudarLugar: (v: { uf: string; cidade: string | null } | null) => void;
+  /** null = perto de mim. "brasil" = sem recorte. */
+  lugar: Lugar;
+  aoMudarLugar: (v: Lugar) => void;
   /** Quantas vagas o filtro atual devolve, para o botão de fechar. */
   totalVagas: number;
 };
@@ -60,6 +63,8 @@ export function FiltrosVagasModal({
     (apenasUrgentes ? 1 : 0) +
     (lugar ? 1 : 0);
 
+  const recorteDeLugar = lugar !== null && lugar !== "brasil";
+
   // Estados presentes nas vagas abertas, para oferecer "RJ inteiro" antes das
   // cidades: quem viaja para trabalhar pensa em praça, não em município.
   const ufs = Array.from(new Set(lugares.map((l) => l.uf)));
@@ -71,8 +76,8 @@ export function FiltrosVagasModal({
     aoMudarLugar(null);
   }
 
-  const mesmoLugar = (a: { uf: string; cidade: string | null } | null, uf: string, cidade: string | null) =>
-    !!a && a.uf === uf && a.cidade === cidade;
+  const mesmoLugar = (a: Lugar, uf: string, cidade: string | null) =>
+    !!a && a !== "brasil" && a.uf === uf && a.cidade === cidade;
 
   return (
     <Modal visible={visivel} transparent animationType="slide" onRequestClose={onFechar}>
@@ -99,6 +104,13 @@ export function FiltrosVagasModal({
             <Text style={styles.rotulo}>ONDE</Text>
             <View style={styles.linha}>
               <Chip label="Perto de mim" selecionado={!lugar} onPress={() => aoMudarLugar(null)} />
+              {/* Sem cadastro nenhum: quem roda o país todo olha o país todo
+                  e se candidata onde faz sentido. */}
+              <Chip
+                label="Todo o Brasil"
+                selecionado={lugar === "brasil"}
+                onPress={() => aoMudarLugar(lugar === "brasil" ? null : "brasil")}
+              />
               {ufs.map((uf) => (
                 <Chip
                   key={uf}
@@ -124,8 +136,9 @@ export function FiltrosVagasModal({
             </View>
 
             {/* Escolher um lugar substitui o raio no banco, então mostrar os
-                dois ao mesmo tempo prometeria um cruzamento que não existe. */}
-            {!lugar && (
+                dois ao mesmo tempo prometeria um cruzamento que não existe.
+                O mesmo vale para "todo o Brasil", que é a ausência de recorte. */}
+            {lugar === null && (
               <>
                 <Text style={styles.rotulo}>RAIO</Text>
                 <View style={styles.linha}>
